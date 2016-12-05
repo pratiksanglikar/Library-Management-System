@@ -6,11 +6,6 @@
 <title>Group-13 - Error 404</title>
 </head>
 <body>
-	<% String[] splits = pageContext.getErrorData().getRequestURI().split("/"); %>
-	<h2>404</h2>
-	<h2>Group - 13</h2>
-	<h3>
-		<%= "The " + splits[1] + " with ID " + splits[2] + " not found in the system!" %>
-	</h3>
+	<h2>404 - Not Found!</h2>
 </body>
 </html>
