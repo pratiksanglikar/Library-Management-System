@@ -1,5 +1,5 @@
 package edu.cmpe275.team13.exceptions;
 
-public class UserNotFoundException {
+public class PatronNotFoundException {
 
 }

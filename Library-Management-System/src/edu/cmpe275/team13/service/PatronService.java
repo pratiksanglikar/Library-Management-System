@@ -1,5 +1,5 @@
 package edu.cmpe275.team13.service;
 
-public class UserService {
+public class PatronService {
 
 }
