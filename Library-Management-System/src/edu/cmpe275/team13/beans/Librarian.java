@@ -1,5 +1,9 @@
 package edu.cmpe275.team13.beans;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  *CREATE TABLE librarian (
  *		librarian_email VARCHAR(50) UNIQUE NOT NULL, 
@@ -9,11 +13,15 @@ package edu.cmpe275.team13.beans;
  *		librarian_verified BOOLEAN DEFAULT 0, 
  *		PRIMARY KEY(librarian_id)); 
  */
+@Entity
+@Table(name = "librarian")
 public class Librarian {
 	
 	private String librarian_email;
 	private String librarian_password;
 	private String librarian_name;
+	
+	@Id
 	private int librarian_id;
 	private boolean librarian_verified;
 	

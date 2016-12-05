@@ -3,6 +3,10 @@ package edu.cmpe275.team13.beans;
 import java.sql.Date;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /*
  * CREATE TABLE book(
  * 		isbn INT(13), 
@@ -23,9 +27,13 @@ import java.util.List;
  * 		FOREIGN KEY(created_by) REFERENCES librarian(librarian_id) ON DELETE NO ACTION,
  * 		FOREIGN KEY(updated_by) REFERENCES librarian(librarian_id) ON DELETE SET NULL); 
  */
+@Entity
+@Table(name = "book")
 public class Book {
 
-	private long isbn;
+	@Id
+	private Long isbn;
+	
 	private String author_name;
 	private String title;
 	private String call_number;
@@ -36,12 +44,13 @@ public class Book {
 	private boolean book_status;
 	private String image;
 	private int available_copies;
-	private Librarian created_by;
-	private Librarian updated_by;
-	private List<Keyword> keywords;
+	private int created_by;
+	private int updated_by;
+	
+	//private List<Keyword> keywords;
 
 	public Book() {
-		this.isbn = -1;
+		this.isbn = -1L;
 		this.author_name = null;
 		this.title = null;
 		this.call_number = null;
@@ -52,15 +61,15 @@ public class Book {
 		this.book_status = false;
 		this.image = null;
 		this.available_copies = 0;
-		this.created_by = null;
-		this.updated_by = null;
-		this.keywords = null;
+		this.created_by = 0;
+		this.updated_by = 0;
+		//this.keywords = null;
 	}
 
-	public Book(long isbn, String author_name, String title, String call_number, 
+	public Book(Long isbn, String author_name, String title, String call_number, 
 			String publisher_name, Date year_of_publication, String location_in_library,
 			int number_of_copies, boolean book_status, String image, 
-			int available_copies, Librarian created_by, Librarian updated_by,
+			int available_copies, int created_by, int updated_by,
 			List<Keyword> keywords) {
 		super();
 		this.isbn = isbn;
@@ -76,20 +85,20 @@ public class Book {
 		this.available_copies = available_copies;
 		this.created_by = created_by;
 		this.updated_by = updated_by;
-		this.keywords = keywords;
+		//this.keywords = keywords;
 	}
 
 	/**
 	 * @return the isbn
 	 */
-	public long getIsbn() {
+	public Long getIsbn() {
 		return isbn;
 	}
 
 	/**
 	 * @param isbn the isbn to set
 	 */
-	public void setIsbn(long isbn) {
+	public void setIsbn(Long isbn) {
 		this.isbn = isbn;
 	}
 
@@ -236,42 +245,42 @@ public class Book {
 	/**
 	 * @return the created_by
 	 */
-	public Librarian getCreated_by() {
+	public int getCreated_by() {
 		return created_by;
 	}
 
 	/**
 	 * @param created_by the created_by to set
 	 */
-	public void setCreated_by(Librarian created_by) {
+	public void setCreated_by(int created_by) {
 		this.created_by = created_by;
 	}
 
 	/**
 	 * @return the updated_by
 	 */
-	public Librarian getUpdated_by() {
+	public int getUpdated_by() {
 		return updated_by;
 	}
 
 	/**
 	 * @param updated_by the updated_by to set
 	 */
-	public void setUpdated_by(Librarian updated_by) {
+	public void setUpdated_by(int updated_by) {
 		this.updated_by = updated_by;
 	}
 
 	/**
 	 * @return keywords in the book.
-	 */
+	 *//*
 	public List<Keyword> getKeywords() {
 		return keywords;
 	}
 
-	/**
+	*//**
 	 * @param keywords
-	 */
+	 *//*
 	public void setKeywords(List<Keyword> keywords) {
 		this.keywords = keywords;
-	}
+	}*/
 }

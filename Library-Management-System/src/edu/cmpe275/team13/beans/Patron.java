@@ -1,5 +1,9 @@
 package edu.cmpe275.team13.beans;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /* 
  * CREATE TABLE patron (
  * 	patron_email VARCHAR(150) UNIQUE NOT NULL, 
@@ -11,11 +15,15 @@ package edu.cmpe275.team13.beans;
  * 	PRIMARY KEY(patron_id));
  * */
 
+@Entity
+@Table(name = "patron")
 public class Patron {
 	
 	private String patron_email;
 	private String patron_password;
 	private String patron_name;
+	
+	@Id
 	private int patron_id;
 	private boolean patron_verified;
 	private int books_issued;
