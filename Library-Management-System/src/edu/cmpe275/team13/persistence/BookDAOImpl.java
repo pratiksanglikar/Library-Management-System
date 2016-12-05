@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
+import edu.cmpe275.team13.exceptions.DeleteBookNotPermitted;
 
 
 
@@ -79,6 +80,9 @@ public class BookDAOImpl implements BookDAO {
     public Book getBookById(Long isbn) {
         EntityManager em = EMF.get().createEntityManager();
         Book book = em.find(Book.class, isbn);
+        if(null == book) {
+        	throw new BookNotFoundException("Book with ISBN " + isbn + " not found!");
+        }
         return book;
     }
 
@@ -90,7 +94,10 @@ public class BookDAOImpl implements BookDAO {
         EntityManager em = EMF.get().createEntityManager();
         Book book = em.find(Book.class, isbn);
         if(null == book) {
-            throw new BookNotFoundException("Book with ID " + isbn + " not found in the system. ");
+            throw new BookNotFoundException("Book with ISBN " + isbn + " not found in the system!");
+        }
+        if(book.getNumber_of_copies() != book.getAvailable_copies()) {
+        	throw new DeleteBookNotPermitted("Book with ISBN " + isbn  + " can not be deleted!");
         }
         em.getTransaction().begin();
         em.remove(book);

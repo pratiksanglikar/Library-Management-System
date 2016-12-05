@@ -22,7 +22,7 @@
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-    <property name="cloudsql.url" value="jdbc:google:mysql://cmpe-275-term-project-team-13-db/cmpe_275_term_project?user=root&amp;password=cmpe275" />
+    <property name="cloudsql.url" value="jdbc:google:mysql://cmpe-275-term-project-team-13-db1/cmpe_275_term_project?user=root&amp;password=cmpe275" />
   </system-properties>
 
   <!--
