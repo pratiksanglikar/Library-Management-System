@@ -18,5 +18,6 @@
 	<h4>"${book.year_of_publication}"</h4>
 	<h4>"${book.location_in_library}"</h4>
 	<h4>"${book.book_status}"</h4>
+	<h4>"${book.keywords}"</h4>
 </body>
 </html>

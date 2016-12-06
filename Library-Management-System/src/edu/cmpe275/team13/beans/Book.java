@@ -46,9 +46,8 @@ public class Book {
 	private int available_copies;
 	private int created_by;
 	private int updated_by;
+	private String keywords;
 	
-	//private List<Keyword> keywords;
-
 	public Book() {
 		this.isbn = -1L;
 		this.author_name = null;
@@ -63,14 +62,14 @@ public class Book {
 		this.available_copies = 0;
 		this.created_by = 0;
 		this.updated_by = 0;
-		//this.keywords = null;
+		this.keywords = null;
 	}
 
 	public Book(Long isbn, String author_name, String title, String call_number, 
 			String publisher_name, Date year_of_publication, String location_in_library,
 			int number_of_copies, boolean book_status, String image, 
 			int available_copies, int created_by, int updated_by,
-			List<Keyword> keywords) {
+			String keywords) {
 		super();
 		this.isbn = isbn;
 		this.author_name = author_name;
@@ -85,7 +84,7 @@ public class Book {
 		this.available_copies = available_copies;
 		this.created_by = created_by;
 		this.updated_by = updated_by;
-		//this.keywords = keywords;
+		this.keywords = keywords;
 	}
 
 	/**
@@ -271,16 +270,18 @@ public class Book {
 	}
 
 	/**
-	 * @return keywords in the book.
-	 *//*
-	public List<Keyword> getKeywords() {
+	 * 
+	 * @return
+	 */
+	public String getKeywords() {
 		return keywords;
 	}
 
-	*//**
+	/**
+	 * 
 	 * @param keywords
-	 *//*
-	public void setKeywords(List<Keyword> keywords) {
+	 */
+	public void setKeywords(String keywords) {
 		this.keywords = keywords;
-	}*/
+	}
 }

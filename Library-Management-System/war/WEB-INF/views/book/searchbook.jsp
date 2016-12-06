@@ -24,7 +24,7 @@
 		<table>
 			<tr>
 				<td><label>ISBN</label></td>
-				<td><input name="isbn" value=${bs.isbn}></td>
+				<td><input name="isbn" value="${bs.isbn}"></td>
 			</tr>
 			<tr>
 				<td><label>Author Name</label></td>
@@ -45,7 +45,7 @@
 			</tr>
 			<tr>
 				<td><label>Book Status</label></td>
-				<td><input name="book_status" value="false"></td>
+				<td><input name="book_status" value="true"></td>
 			</tr>
 			<%-- <tr>
 				<td><label>Available Copies</label></td>
@@ -54,12 +54,16 @@
 			<!-- created by must be set by the librarian logged into the system -->
 			<tr>
 				<td><label>Created By</label></td>
-				<td><input name="created_by" value=${bs.created_by}></td>
+				<td><input name="created_by" value="${bs.created_by}"></td>
 			</tr>
 			<!--  updated by must be set by the librarian logged into the system -->
 			<tr>
 				<td><label>Updated By</label></td>
-				<td><input name="updated_by" value=${bs.updated_by}></td>
+				<td><input name="updated_by" value="${bs.updated_by}"></td>
+			</tr>
+			<tr>
+				<td><label>Keywords</label></td>
+				<td><input name="keywords" value="${bs.keywords}" placeholder="Enter ; seperated keywords"></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value="Search Book" /></td>

@@ -66,6 +66,10 @@
 				<td><input name= "updated_by"></td>
 			</tr>
 			<tr>
+				<td><label>Keywords</label></td>
+				<td><input name="keywords" placeholder="Enter ; seperated keywords"></td>
+			</tr>
+			<tr>
 				<td colspan="2"><input type= "submit" value ="Add Book"/></td>
 			</tr>
 		</table>

@@ -1,8 +1,6 @@
 package edu.cmpe275.team13.persistence;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,12 +106,12 @@ public class BookDAOImpl implements BookDAO {
 
 	@Override
 	public List<Book> searchBySpec(BookSearch bookSpec) {
-		EntityManager em = EMF.get().createEntityManager();
-		boolean isbn_set = false, author_name_set = false, title_set = false, publisher_name_set = false,
-				year_set = false, updated_by_set = false, created_by_set = false, is = false;
 		if (null == bookSpec) {
 			return new ArrayList<Book>(0);
 		}
+		EntityManager em = EMF.get().createEntityManager();
+		boolean isbn_set = false, author_name_set = false, title_set = false, publisher_name_set = false,
+				year_set = false, updated_by_set = false, created_by_set = false, is = false, keywords_set = false;
 		String queryString = "SELECT e FROM Book e where ";
 		if (bookSpec.getIsbn() != null) {
 			if (!is) {
@@ -184,6 +182,20 @@ public class BookDAOImpl implements BookDAO {
 			}
 			created_by_set = true;
 		}
+		if (bookSpec.getKeywords() != null && bookSpec.getKeywords().length > 0) {
+			String kywrdstrng = " e.keywords like :keyword0 ";
+			for (int i = 1; i < bookSpec.getKeywords().length; i++) {
+				kywrdstrng += " OR e.keywords like :keyword" + i + " ";
+			}
+			//kywrdstrng += " )";
+			if (!is) {
+				queryString += kywrdstrng;
+				is = !is;
+			} else {
+				queryString += " AND " + kywrdstrng;
+			}
+			keywords_set = true;
+		}
 		Query query = em.createQuery(queryString);
 		if (isbn_set) {
 			query.setParameter("isbn", bookSpec.getIsbn());
@@ -206,6 +218,12 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (updated_by_set) {
 			query.setParameter("updated_by", bookSpec.getUpdated_by());
+		}
+		if (keywords_set) {
+			String[] keywords = bookSpec.getKeywords();
+			for (int i = 0; i < keywords.length; i++) {
+				query.setParameter("keyword" + i, "%" + keywords[i] +"%");
+			}
 		}
 		System.out.println(query.toString());
 		System.out.println("Created By" + bookSpec.getCreated_by());

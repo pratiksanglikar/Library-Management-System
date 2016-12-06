@@ -66,6 +66,10 @@
 				<td><input name= "updated_by" value="${book.updated_by}" readonly></td>
 			</tr>
 			<tr>
+				<td><label>Keywords</label></td>
+				<td><input name="keywords" value="${book.keywords}" placeholder="Enter ; seperated keywords"></td>
+			</tr>
+			<tr>
 				<td colspan="2"><input type= "submit" value ="Update Book"/></td>
 			</tr>
 		</table>

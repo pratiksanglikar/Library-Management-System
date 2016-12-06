@@ -1,5 +1,7 @@
 package edu.cmpe275.team13.beans;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,8 +17,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "librarian")
-public class Librarian {
+public class Librarian implements Serializable {
 	
+	private static final long serialVersionUID = -3748073777433741113L;
 	private String librarian_email;
 	private String librarian_password;
 	private String librarian_name;

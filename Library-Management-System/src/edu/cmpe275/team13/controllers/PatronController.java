@@ -4,6 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,15 +29,6 @@ public class PatronController {
 	@Autowired
 	private LibrarianDAOImpl libDao;
 
-	/*
-	 * ClassPathXmlApplicationContext context = new
-	 * ClassPathXmlApplicationContext("servlet-context.xml");
-	 */
-	// ClassPathXmlApplicationContext context = new
-	// ClassPathXmlApplicationContext("beans.xml");
-	// Mailmail mail = context.getBean(Mailmail.class);
-
-	// @Autowired
 	private Mailmail mail = new Mailmail();
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -45,7 +38,7 @@ public class PatronController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String patronLogin(@RequestParam("email") String email, @RequestParam("password") String password,
-			Model model) throws NoSuchAlgorithmException {
+			Model model, HttpSession session) throws NoSuchAlgorithmException {
 
 		if (email.contains("@sjsu.edu")) {
 			Librarian librarian = libDao.validateLibrarian(email, getSHADigest(password));
@@ -53,6 +46,8 @@ public class PatronController {
 				model.addAttribute("error", "Username and password do not match");
 			} else {
 				if (librarian.isLibrarian_verified()) {
+					session.setAttribute("user", librarian);
+					session.setAttribute("type", "librarian");
 					return "loginHome";
 				} else {
 					model.addAttribute("error", "Please verify your email.");
@@ -64,6 +59,8 @@ public class PatronController {
 				model.addAttribute("error", "Username and password do not match");
 			} else {
 				if (patron.isPatron_verified()) {
+					session.setAttribute("user", patron);
+					session.setAttribute("type", "patron");
 					return "loginHome";
 				} else {
 					model.addAttribute("error", "Please verify your email.");
@@ -86,7 +83,6 @@ public class PatronController {
 			// System.out.println("inside if");
 			String[] s = decodedKey.split(":");
 			int patron_id = Integer.parseInt(s[0]);
-			String username = s[1];
 
 			// System.out.println(username);
 			Librarian librarian = libDao.getLibrarian(patron_id);
@@ -111,32 +107,23 @@ public class PatronController {
 
 		if (patron_email.contains("@sjsu.edu")) {
 			Librarian librarian = new Librarian();
-
 			librarian.setLibrarian_name(patron_name);
-
 			librarian.setLibrarian_email(patron_email);
 			librarian.setLibrarian_id(patron_id);
 			patron_password = getSHADigest(patron_password);
 			librarian.setLibrarian_password(patron_password);
 			if (!libDao.isLibrarianPresent(librarian)) {
-
 				libDao.createLibrarian(librarian);
-				// System.out.println("created libraraian");
 			} else {
 				model.addAttribute("error", "This email already exist!");
 				return "librariansignup";
 			}
-
 			String link = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/librarianActivationlink?key=";
 			String s = librarian.getLibrarian_id() + ":" + librarian.getLibrarian_email() + ":" + "shrutSalt";
-			// System.out.println("string:" + s);
 			link = link + Base64.encodeBase64String(s.getBytes());
-			String sender = "librarymanagement275@gmail.com";// write here
-																// sender gmail
-																// id
-			String receiver = librarian.getLibrarian_email();// write here
-																// receiver id
-			mail.sendMail(sender, receiver, "Sub: activation link", link);
+			String sender = "librarymanagement275@gmail.com";
+			String receiver = librarian.getLibrarian_email();
+			mail.sendMail(sender, receiver, "SJPL: Library Membership Activation Link", link);
 
 		}
 
@@ -151,21 +138,13 @@ public class PatronController {
 			if (!patronDAO.isPatronPresent(patron)) {
 
 				patronDAO.createPatron(patron);
-				// System.out.println("created patron");
-
-				// mail =(Mailmail)context.getBean("mailMail");
-
 				String link = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/activationlink?key=";
 				String s = patron.getPatron_id() + ":" + patron.getPatron_email() + ":" + "shrutSalt";
 				System.out.println("string:" + s);
 				link = link + Base64.encodeBase64String(s.getBytes());
-				String sender = "librarymanagement275@gmail.com";// write here
-																	// sender
-																	// gmail id
-				String receiver = patron.getPatron_email();// write here
-															// receiver id
-				mail.sendMail(sender, receiver, "Sub: activation link", link);
-
+				String sender = "librarymanagement275@gmail.com";
+				String receiver = patron.getPatron_email();
+				mail.sendMail(sender, receiver, "SJPL: Library Membership Activation Link", link);
 				System.out.println("success");
 			} else {
 				System.out.println("already present");
@@ -182,7 +161,6 @@ public class PatronController {
 		if (decodedKey.contains(":")) {
 			String[] s = decodedKey.split(":");
 			int patron_id = Integer.parseInt(s[0]);
-			String username = s[1];
 			Patron patron = patronDAO.getPatron(patron_id);
 			patron.setPatron_verified(true);
 			patronDAO.updatePatron(patron);

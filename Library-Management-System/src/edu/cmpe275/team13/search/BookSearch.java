@@ -1,6 +1,7 @@
 package edu.cmpe275.team13.search;
 
 import java.sql.Date;
+import java.util.List;
 
 public class BookSearch {
 	private String title;
@@ -11,7 +12,7 @@ public class BookSearch {
 	private boolean book_status;
 	private int created_by;
 	private int updated_by;
-	//TODO keywords
+	private String[] keywords;
 	
 	public BookSearch() {
 		this.isbn = -1L;
@@ -22,11 +23,12 @@ public class BookSearch {
 		this.book_status = false;
 		this.created_by = 0;
 		this.updated_by = 0;
+		this.setKeywords(null);
 	}
 	
 	public BookSearch(String title, String author_name, String publisher_name, 
 			Long isbn, Date year_of_publication, boolean book_status, int created_by, 
-			int updated_by) {
+			int updated_by, String[] keywords) {
 		super();
 		this.title = title;
 		this.author_name = author_name;
@@ -36,10 +38,8 @@ public class BookSearch {
 		this.book_status = book_status;
 		this.created_by = created_by;
 		this.updated_by = updated_by;
+		this.setKeywords(keywords);
 	}
-
-
-
 
 	/**
 	 * @return the title
@@ -147,6 +147,20 @@ public class BookSearch {
 				+ ", isbn=" + isbn + ", year_of_publication=" + year_of_publication + ", book_status=" + book_status
 				+ ", created_by=" + created_by + ", updated_by=" + updated_by + "]";
 	}
-	
-	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	/**
+	 * 
+	 * @param keywords
+	 */
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
 }
