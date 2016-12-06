@@ -40,7 +40,7 @@
 			</tr>
 			<tr>
 				<td><label>Year of Publication</label></td>
-				<td><input type="date" name="year_of_publication"
+				<td><input type="text" name="year_of_publication" placeholder="yyyy-mm-dd"
 					value="${bs.year_of_publication}"></td>
 			</tr>
 			<tr>

@@ -1,5 +1,6 @@
 package edu.cmpe275.team13.controllers;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.persistence.BookDAOImpl;
 import edu.cmpe275.team13.search.BookRepository;
 import edu.cmpe275.team13.search.BookSearch;
 import edu.cmpe275.team13.search.BookSpecification;
@@ -94,20 +96,18 @@ public class BookController {
 	}
 
 	@RequestMapping(value = "/searchbook", method = RequestMethod.GET)
-	public String search(@RequestParam Map<String, String> map) {
-		/*BookSearch booksearch = new BookSearch(map.get("title"), map.get("author_name"), map.get("publisher_name"),
-				Long.parseLong(map.get("isbn")), null, true, Integer.parseInt(map.get("created_by")), Integer.parseInt(map.get("updated_by")));
-				*/
-		BookSearch booksearch = new BookSearch(null, null, null,
-				Long.parseLong(map.get("isbn")), null, true, Integer.MIN_VALUE, Integer.MIN_VALUE);
-		BookSpecification bookSpec = new BookSpecification(booksearch);
-		List<Book> books = bookRepository.findAll(bookSpec);
-		// mav.addObject(bookSearch);
-		// mav.addObject("books",books);
-		// System.out.println();
-		// return mav;
+	public String search(@RequestParam Map<String, String> map, Model model) {
+		int created_by = (map.get("created_by") == null || map.get("created_by").trim().length() == 0) ? Integer.MIN_VALUE : Integer.parseInt(map.get("created_by"));
+		int updated_by = (map.get("updated_by") == null || map.get("updated_by").trim().length() == 0) ? Integer.MIN_VALUE : Integer.parseInt(map.get("updated_by"));
+		Long isbn = (map.get("isbn") == null || map.get("isbn").trim().length() == 0) ? null : Long.parseLong(map.get("isbn"));
+		Date year = (map.get("year_of_publication") == null || map.get("year_of_publication").trim().length() == 0) ? null : Date.valueOf(map.get("year_of_publication"));
+		boolean status = (map.get("book_status") == null || map.get("book_status").trim().length() == 0) ? false : ((map.get("book_status").trim().equalsIgnoreCase("false") ? false : true));
+		BookSearch booksearch = new BookSearch(map.get("title").trim(), map.get("author_name").trim(), map.get("publisher_name").trim(),
+				isbn, year, status, created_by, updated_by);
+		List<Book> books = this.bookservice.searchBySpec(booksearch);
 		System.out.println(books.size());
-		return "redirect:/books/search";
+		model.addAttribute("books", books);
+		return "book/searchresults";
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET)

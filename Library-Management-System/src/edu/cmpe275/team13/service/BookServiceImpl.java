@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.persistence.BookDAO;
+import edu.cmpe275.team13.search.BookSearch;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -45,6 +46,11 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void removeBook(Long isbn) {
 		bookDAO.removeBook(isbn);
+	}
+
+	@Override
+	public List<Book> searchBySpec(BookSearch bookSpec) {
+		return bookDAO.searchBySpec(bookSpec);
 	}
 
 }

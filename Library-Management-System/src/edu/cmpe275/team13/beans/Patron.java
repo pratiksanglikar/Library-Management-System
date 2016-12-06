@@ -138,4 +138,8 @@ public class Patron {
 	public String getPatron_password() {
 		return patron_password;
 	}
+
+	public void setPatron_password(String patron_password) {
+		this.patron_password = patron_password;
+	}
 }

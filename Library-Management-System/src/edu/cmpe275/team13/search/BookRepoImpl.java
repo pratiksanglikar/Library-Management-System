@@ -2,6 +2,8 @@ package edu.cmpe275.team13.search;
 
 import java.util.List;
 
+import javax.persistence.Query;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,21 +31,6 @@ public class BookRepoImpl implements BookRepository<Book> {
 	}
 
 	@Override
-	public List<Book> findAll(Specification<Book> spec) {
-		/*EntityManager em = EMF.get().createEntityManager();
-		CriteriaBuilder builder = em.getCriteriaBuilder();
-		CriteriaQuery<Book> query = builder.createQuery(Book.class);
-		
-		//Session session;
-		//Criteria criteria = session.createCriteria(Book.class);
-		
-		Selection<? extends Book> root = (Selection<? extends Book>) query.from(Book.class);
-		query.where(spec.toPredicate((Root<Book>) root, query, builder));
-		return em.createQuery(query.select(root).toString()).getResultList();*/
-		return null;
-	}
-
-	@Override
 	public Page<Book> findAll(Specification<Book> arg0, Pageable arg1) {
 		// TODO Auto-generated method stub
 		return null;
@@ -57,6 +44,12 @@ public class BookRepoImpl implements BookRepository<Book> {
 
 	@Override
 	public Book findOne(Specification<Book> arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Book> findAll(Specification<Book> arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
