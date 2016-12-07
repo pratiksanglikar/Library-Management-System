@@ -9,6 +9,8 @@
         <class>edu.cmpe275.team13.beans.Book</class>
         <class>edu.cmpe275.team13.beans.Librarian</class>
         <class>edu.cmpe275.team13.beans.Patron</class>
+        <class>edu.cmpe275.team13.beans.IssueBook</class>
+        <class>edu.cmpe275.team13.beans.IssueBookID</class>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>
             <property name="datanucleus.NontransactionalWrite" value="true"/>

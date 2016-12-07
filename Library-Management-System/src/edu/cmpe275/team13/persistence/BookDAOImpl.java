@@ -69,7 +69,6 @@ public class BookDAOImpl implements BookDAO {
 	 */
 	@Override
 	public List<Book> listBooks() {
-		// FIXME
 		return null;
 	}
 
@@ -78,11 +77,13 @@ public class BookDAOImpl implements BookDAO {
 	 */
 	@Override
 	public Book getBookById(Long isbn) {
+		System.out.println("Getting book by id: " + isbn);
 		EntityManager em = EMF.get().createEntityManager();
 		Book book = em.find(Book.class, isbn);
 		if (null == book) {
 			throw new BookNotFoundException("Book with ISBN " + isbn + " not found!");
 		}
+		em.close();
 		return book;
 	}
 
@@ -102,6 +103,7 @@ public class BookDAOImpl implements BookDAO {
 		em.getTransaction().begin();
 		em.remove(book);
 		em.getTransaction().commit();
+		em.close();
 	}
 
 	@Override
@@ -225,10 +227,9 @@ public class BookDAOImpl implements BookDAO {
 				query.setParameter("keyword" + i, "%" + keywords[i] +"%");
 			}
 		}
-		System.out.println(query.toString());
-		System.out.println("Created By" + bookSpec.getCreated_by());
 		@SuppressWarnings("unchecked")
 		List<Book> list = query.getResultList();
+		em.close();
 		return list;
 	}
 }

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.beans.Librarian;
+import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;
 import edu.cmpe275.team13.search.BookSearch;
 import edu.cmpe275.team13.service.BookService;
@@ -75,8 +77,7 @@ public class BookController {
 		}
 		Book book_db = this.bookservice.getBookById(isbn);
 		if (null == book_db) {
-			// return createBook(book); TODO
-			return null;
+			throw new BookNotFoundException();
 		}
 		// ASSUMED book status will update in business logic according to
 		// checkout
@@ -91,8 +92,7 @@ public class BookController {
 		book_db.setNumber_of_copies(book.getNumber_of_copies());
 		book_db.setImage(book.getImage());
 		book_db.setKeywords(book.getKeywords());
-		// book_db.setUpdated_by(book.getUpdated_by()); TODO take it from
-		// currently logged in user.
+		book_db.setUpdated_by(((Librarian)session.getAttribute("librarian")).getLibrarian_id());
 		this.bookservice.updateBook(book_db);
 		return "redirect:/books/librarian/" + isbn;
 	}
@@ -134,6 +134,7 @@ public class BookController {
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
+		book.setCreated_by(((Librarian) session.getAttribute("librarian")).getLibrarian_id());
 		Long isbn = this.bookservice.addBook(book);
 		return "redirect:/books/" + isbn;
 	}

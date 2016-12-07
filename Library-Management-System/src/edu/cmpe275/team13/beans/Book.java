@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * 		available_copies INT NOT NULL, 
  * 		created_by INT NOT NULL, 
  * 		updated_by INT, 
- * 		
+ * 		keywords VARCHAR2(50),
  * 		PRIMARY KEY(isbn), 
  * 		FOREIGN KEY(created_by) REFERENCES librarian(librarian_id) ON DELETE NO ACTION,
  * 		FOREIGN KEY(updated_by) REFERENCES librarian(librarian_id) ON DELETE SET NULL); 
