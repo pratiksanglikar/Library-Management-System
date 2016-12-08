@@ -44,7 +44,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		tx.begin();
 		int i = 1;
 		try {
-			List<IssueBook> booksPending = getBooksPending(transaction.getPatron().getPatron_id());
+			List<IssueBook> booksPending = getPendingBooks(transaction.getPatron().getPatron_id());
 			for (IssueBook issueBook : booksPending) {
 				for (Book book : books) {
 					if(book.getIsbn().equals(issueBook.getId().getIsbn())) {
@@ -77,7 +77,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
-	private List<IssueBook> getBooksPending(int patron_id) {
+	@Override
+	public List<IssueBook> getPendingBooks(int patron_id) {
 		System.out.println("in getBooksPending");
 		EntityManager em = EMF.get().createEntityManager();
 		Query query = em.createQuery("SELECT e FROM IssueBook e WHERE e.id.patron_id = :patron_id AND e.actual_return_date IS NULL");

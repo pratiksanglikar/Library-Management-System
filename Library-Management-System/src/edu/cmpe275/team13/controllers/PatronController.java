@@ -31,6 +31,18 @@ public class PatronController {
 
 	private Mailmail mail = new Mailmail();
 
+	@RequestMapping(value = "/")
+	public String getWelcomePage() {
+		return "home";
+	}
+
+	@RequestMapping(value = "/logout")
+	public String logout(HttpSession session) {
+		if (session != null)
+			session.invalidate();
+		return "home";
+	}
+
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String getPatronLogin(Locale locale, Model model) {
 		return "patronLogin";
@@ -48,7 +60,8 @@ public class PatronController {
 				if (librarian.isLibrarian_verified()) {
 					session.setAttribute("user", librarian);
 					session.setAttribute("type", "librarian");
-					return "loginHome";
+					session.setAttribute("user_id", librarian.getLibrarian_id());
+					return "book/searchbook";
 				} else {
 					model.addAttribute("error", "Please verify your email.");
 				}
@@ -61,13 +74,14 @@ public class PatronController {
 				if (patron.isPatron_verified()) {
 					session.setAttribute("user", patron);
 					session.setAttribute("type", "patron");
-					return "loginHome";
+					session.setAttribute("user_id", patron.getPatron_id());
+					// return "patrondashboard";
+					return "redirect:/transaction/summary";
 				} else {
 					model.addAttribute("error", "Please verify your email.");
 				}
 			}
 		}
-
 		return "login";
 	}
 
@@ -75,21 +89,14 @@ public class PatronController {
 	public String librarianUpdateActivationLink(@RequestParam("key") String key, Model model) {
 
 		byte[] b = Base64.decodeBase64(key);
-		// System.out.println(key);
 		String decodedKey = new String(b);
-		// System.out.println(decodedKey);
-		// System.out.println("libbb");
 		if (decodedKey.contains(":")) {
-			// System.out.println("inside if");
 			String[] s = decodedKey.split(":");
 			int patron_id = Integer.parseInt(s[0]);
-
-			// System.out.println(username);
 			Librarian librarian = libDao.getLibrarian(patron_id);
 			librarian.setLibrarian_verified(true);
 			libDao.updateLibrarian(librarian);
-			// System.out.println("Librarian account verified");
-
+			sendConfirmationMail(librarian.getLibrarian_email());
 		}
 		return "home";
 	}
@@ -164,8 +171,16 @@ public class PatronController {
 			Patron patron = patronDAO.getPatron(patron_id);
 			patron.setPatron_verified(true);
 			patronDAO.updatePatron(patron);
+			sendConfirmationMail(patron.getPatron_email());
 		}
 		return "home";
+	}
+
+	private void sendConfirmationMail(String to) {
+		String sender = "librarymanagement275@gmail.com";
+		mail.sendMail(sender, to, "Team - 13 - Library Management - Activation Successfull",
+				"Hi, your account is now activated. Please login to access your account!");
+
 	}
 
 	private String getSHADigest(String string) throws NoSuchAlgorithmException {

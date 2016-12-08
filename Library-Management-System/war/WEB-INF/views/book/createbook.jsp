@@ -8,6 +8,10 @@
 <title>Library Management System: create book</title>
 </head>
 <body>
+<p style="float:right;">
+	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	</p>
+	
 	<h1>Book:</h1>
 	<form action = "/books/" method = "post">
 		<table>

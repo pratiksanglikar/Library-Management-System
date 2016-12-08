@@ -8,6 +8,10 @@
 <title>Book</title>
 </head>
 <body>
+<p style="float:right;">
+	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	</p>
+	
 	<% Book book = (Book) request.getAttribute("book"); %>
 	<h2>"${book.title}"</h2>
 	<img alt="Title" src="${book.image}">

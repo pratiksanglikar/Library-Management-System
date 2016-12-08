@@ -32,5 +32,6 @@
 			<div style="color: red">${error}</div>
 		</div>
 	</form>
+	<form action="/login" method="GET"><input type="submit" value="Login"></form>
 </body>
 </html>

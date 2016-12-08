@@ -1,8 +1,11 @@
 package edu.cmpe275.team13.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.Transaction;
 import edu.cmpe275.team13.exceptions.TransactionLimitExceededException;
 import edu.cmpe275.team13.persistence.TransactionDAO;
@@ -34,5 +37,10 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 		}
 		this.transacationDAO.performTransaction(transaction);
+	}
+
+	@Override
+	public List<IssueBook> getPendingBooks(int patron_id) {
+		return this.transacationDAO.getPendingBooks(patron_id);
 	}
 }
