@@ -2,19 +2,23 @@ package edu.cmpe275.team13.controllers;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.beans.Transaction;
+import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;
 import edu.cmpe275.team13.persistence.PatronDAOImpl;
 import edu.cmpe275.team13.service.BookService;
 import edu.cmpe275.team13.service.TransactionService;
@@ -22,44 +26,78 @@ import edu.cmpe275.team13.service.TransactionService;
 @Controller
 @RequestMapping(value = "/transaction")
 public class TransactionController {
-	
+
 	@Autowired
 	private TransactionService transactionService;
-	
+
 	@Autowired
 	private BookService bookservice;
-	
+
 	@Autowired
 	private PatronDAOImpl patronService;
-	
-	@RequestMapping(value = "/return", method = RequestMethod.GET) 
-	public String returnBooks(/*HttpSession session*/) {
-		/*if(session.getAttribute("type").equals("librarian")) {
-		throw new UnauthorizedAccessException();
-		}*/
-		//@SuppressWarnings("unchecked")
-		/*List<Long> book_list = (List<Long>) session.getAttribute("book_list");
-		Patron patron = (Patron) session.getAttribute("user");*/
-		List<Long> book_list = Arrays.asList(new Long[]{9780596808334L,9781449399917L});
-		Patron patron = this.patronService.getPatron(787878);
+
+	@RequestMapping(value = "/return", method = RequestMethod.GET)
+	public String returnBooks(HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
+		if (session.getAttribute("type").equals("librarian")) {
+			throw new UnauthorizedAccessException();
+		}
+		@SuppressWarnings("unchecked")
+		List<Long> book_list = (List<Long>) session.getAttribute("book_list");
+		Set<Long> unique = new HashSet<Long>(book_list);
+		book_list = new ArrayList<Long>(unique);
+		Patron patron = this.patronService.getPatron((int) session.getAttribute("user_id"));
 		Transaction transaction = prepareTransaction(patron, book_list, false);
 		transactionService.performTransaction(transaction);
-		return "redirect:/books/search"; // TODO
+		session.setAttribute("book_list", new ArrayList<Long>(0));
+		return "redirect:/transaction/summary";
 	}
 
-	@RequestMapping(value = "/checkout", method = RequestMethod.GET) 
-	public String checkoutBooks(/*HttpSession session*/) {
-		/*if(session.getAttribute("type").equals("librarian")) {
+	@RequestMapping(value = "/checkout", method = RequestMethod.GET)
+	public String checkoutBooks(HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
+		if (session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
-		}*/
-		//@SuppressWarnings("unchecked")
-		/*List<Long> book_list = (List<Long>) session.getAttribute("book_list");
-		Patron patron = (Patron) session.getAttribute("user");*/
-		List<Long> book_list = Arrays.asList(new Long[]{9780596808334L,9781449399917L});
-		Patron patron = this.patronService.getPatron(787878);
+		}
+		@SuppressWarnings("unchecked")
+		List<Long> book_list = (List<Long>) session.getAttribute("book_list");
+		Set<Long> unique = new HashSet<Long>(book_list);
+		book_list = new ArrayList<Long>(unique);
+		Patron patron = this.patronService.getPatron((int) session.getAttribute("user_id"));
 		Transaction transaction = prepareTransaction(patron, book_list, true);
 		transactionService.performTransaction(transaction);
-		return "redirect:/books/search"; // TODO
+		session.setAttribute("book_list", new ArrayList<Long>(0));
+		return "redirect:/transaction/summary";
+	}
+	
+	@RequestMapping(value = "/summary", method = RequestMethod.GET)
+	public String getSummary(HttpSession session, Model model) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
+		if(session.getAttribute("type").equals("librarian")) {
+			throw new UnauthorizedAccessException();
+		}
+		int patron_id = (int) session.getAttribute("user_id");
+		Patron patron = this.patronService.getPatron(patron_id);
+		List<IssueBook> issue_books = this.transactionService.getPendingBooks(patron_id);
+		List<Book> books = prepareBooks(issue_books);
+		model.addAttribute("patron", patron);
+		model.addAttribute("issue_books", issue_books);
+		model.addAttribute("books", books);
+		return "patrondashboard";
+	}
+
+	private List<Book> prepareBooks(List<IssueBook> issue_books) {
+		List<Book> books = new ArrayList<Book>(0);
+		for (IssueBook issueBook : issue_books) {
+			books.add(this.bookservice.getBookById(issueBook.getId().getIsbn()));
+		}
+		return books;
 	}
 
 	private Transaction prepareTransaction(Patron patron, List<Long> book_list, boolean isCheckout) {
@@ -70,8 +108,7 @@ public class TransactionController {
 		Transaction transaction = new Transaction(books, patron, new Date(new java.util.Date().getTime()), isCheckout);
 		return transaction;
 	}
-	
-	
+
 	/**
 	 * @return the transactionService
 	 */
@@ -80,7 +117,8 @@ public class TransactionController {
 	}
 
 	/**
-	 * @param transactionService the transactionService to set
+	 * @param transactionService
+	 *            the transactionService to set
 	 */
 	public void setTransactionService(TransactionService transactionService) {
 		this.transactionService = transactionService;
@@ -94,7 +132,8 @@ public class TransactionController {
 	}
 
 	/**
-	 * @param bookservice the bookservice to set
+	 * @param bookservice
+	 *            the bookservice to set
 	 */
 	public void setBookservice(BookService bookservice) {
 		this.bookservice = bookservice;
@@ -108,7 +147,8 @@ public class TransactionController {
 	}
 
 	/**
-	 * @param patronService the patronService to set
+	 * @param patronService
+	 *            the patronService to set
 	 */
 	public void setPatronService(PatronDAOImpl patronService) {
 		this.patronService = patronService;

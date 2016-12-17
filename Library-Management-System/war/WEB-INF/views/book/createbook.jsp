@@ -6,8 +6,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Library Management System: create book</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
+<p style="float:right;">
+	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	</p>
+	
 	<h1>Book:</h1>
 	<form action = "/books/" method = "post">
 		<table>

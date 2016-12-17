@@ -1,12 +1,15 @@
 package edu.cmpe275.team13.controllers;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -45,7 +48,10 @@ public class BookController {
 	}
 
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.GET)
-	public String getBook(@PathVariable long isbn, Model model) {
+	public String getBook(@PathVariable long isbn, Model model, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		Book book = bookservice.getBookById(isbn);
 		model.addAttribute("book", book);
 		return "book/showbook";
@@ -53,6 +59,9 @@ public class BookController {
 
 	@RequestMapping(value = "librarian/{isbn}", method = RequestMethod.GET)
 	public String getBookLibrarian(@PathVariable long isbn, Model model, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
@@ -63,15 +72,37 @@ public class BookController {
 
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.DELETE)
 	public String deleteBook(@PathVariable Long isbn, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
 		this.bookservice.removeBook(isbn);
 		return "redirect:/index.jsp";
 	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/addtocart/{isbn}", method = RequestMethod.GET) 
+	public ResponseEntity<Void> addToCart(@PathVariable Long isbn, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+		}
+		List<Long> book_list = (List<Long>) session.getAttribute("book_list");
+		if(null == book_list) {
+			book_list = new ArrayList<Long>(0);
+		}
+		book_list.add(isbn);
+		System.out.println("Size of the book_list" + book_list.size());
+		session.setAttribute("book_list", book_list);
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.POST)
 	public String updateBook(@PathVariable Long isbn, @ModelAttribute Book book, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
@@ -79,11 +110,7 @@ public class BookController {
 		if (null == book_db) {
 			throw new BookNotFoundException();
 		}
-		// ASSUMED book status will update in business logic according to
-		// checkout
 		book_db.setAuthor_name(book.getAuthor_name());
-		// book_db.setAvailable_copies(book.getAvailable_copies()); ASSUMED
-		// Business Logic will take care while checkout
 		book_db.setTitle(book.getTitle());
 		book_db.setCall_number(book.getCall_number());
 		book_db.setPublisher_name(book.getPublisher_name());
@@ -92,13 +119,16 @@ public class BookController {
 		book_db.setNumber_of_copies(book.getNumber_of_copies());
 		book_db.setImage(book.getImage());
 		book_db.setKeywords(book.getKeywords());
-		book_db.setUpdated_by(((Librarian)session.getAttribute("librarian")).getLibrarian_id());
+		book_db.setUpdated_by((int) session.getAttribute("user_id"));
 		this.bookservice.updateBook(book_db);
-		return "redirect:/books/librarian/" + isbn;
+		return "redirect:/books/search";
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String listBooks(HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
@@ -106,7 +136,10 @@ public class BookController {
 	}
 
 	@RequestMapping(value = "/searchbook", method = RequestMethod.GET)
-	public String search(@RequestParam Map<String, String> map, Model model) {
+	public String search(@RequestParam Map<String, String> map, Model model, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		int created_by = (map.get("created_by") == null || map.get("created_by").trim().length() == 0) ? Integer.MIN_VALUE : Integer.parseInt(map.get("created_by"));
 		int updated_by = (map.get("updated_by") == null || map.get("updated_by").trim().length() == 0) ? Integer.MIN_VALUE : Integer.parseInt(map.get("updated_by"));
 		Long isbn = (map.get("isbn") == null || map.get("isbn").trim().length() == 0) ? null : Long.parseLong(map.get("isbn"));
@@ -122,7 +155,10 @@ public class BookController {
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public String searchBook() {
+	public String searchBook(HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		return "book/searchbook";
 	}
 
@@ -131,6 +167,9 @@ public class BookController {
 	 */
 	@RequestMapping(method = RequestMethod.POST)
 	public String createBook(@ModelAttribute Book book, HttpSession session) {
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
