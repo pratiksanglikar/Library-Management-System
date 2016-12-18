@@ -17,17 +17,21 @@ public class IssueBook {
 	
 	private Timestamp actual_return_date;
 	
+	private int fine;
+	
 	public IssueBook() {
 		id = null;
 		due_date = null;
 		actual_return_date = null;
+		setFine(0);
 	}
 	
-	public IssueBook(IssueBookID id, Timestamp due_date, Timestamp actual_return_date) {
+	public IssueBook(IssueBookID id, Timestamp due_date, Timestamp actual_return_date, int fine) {
 		super();
 		this.id = id;
 		this.due_date = due_date;
 		this.actual_return_date = actual_return_date;
+		this.setFine(fine);
 	}
 
 	/**
@@ -70,5 +74,13 @@ public class IssueBook {
 	 */
 	public void setActual_return_date(Timestamp actual_return_date) {
 		this.actual_return_date = actual_return_date;
+	}
+
+	public int getFine() {
+		return fine;
+	}
+
+	public void setFine(int fine) {
+		this.fine = fine;
 	}
 }

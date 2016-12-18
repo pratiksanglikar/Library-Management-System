@@ -61,7 +61,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				for (Book book : books) {
 					if (book.getIsbn().equals(issueBook.getId().getIsbn())) {
 						issueBook.setActual_return_date(new Timestamp(new java.util.Date().getTime()));
-						// TODO calculate fine.
+						//TODO fine
 						mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
 								+ issueBook.getId().getIssue_date().toLocaleString() + "\t\t Return Date: "
 								+ issueBook.getActual_return_date().toLocaleString());
@@ -112,19 +112,27 @@ public class TransactionDAOImpl implements TransactionDAO {
 			cal.add(Calendar.DATE, 3);
 			Timestamp endTs = new Timestamp(cal.getTime().getTime());
 			if (isWaitlisted) {
+				Patron waitlisted = this.patronDAO.getPatron(list.get(0).getId().getPatron_id());
 				Reservation reservation = new Reservation(
-						new ReservationId(book.getIsbn(), list.get(0).getId().getPatron_id(), ts), endTs, false);
+						new ReservationId(book.getIsbn(), waitlisted.getPatron_id(), ts), endTs, false);
 				String messgae = "The book that you were in waitlist - " + book.getTitle()
 						+ " - is now available. You can checkout this book before " + endTs.toLocaleString() + ".";
-				Patron waitlisted = this.patronDAO.getPatron(list.get(0).getId().getPatron_id());
+				
 				sendMail(waitlisted.getPatron_email(), "Book available", messgae);
 				em.merge(reservation);
 				em.remove(list.get(0));
+				Query query1 = em.createQuery("DELETE FROM Waitlist e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid");
+				System.out.println("ISBN: " + book.getIsbn());
+				System.out.println("PID: " + waitlisted.getPatron_id());
+				query1.setParameter("isbn", book.getIsbn());
+				query1.setParameter("pid", waitlisted.getPatron_id());
+				query1.executeUpdate();
 			}
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -143,12 +151,14 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return list;
 	}
 
+	@SuppressWarnings("null")
 	private void performCheckoutTransaction(Transaction transaction) {
+		System.out.println("In checkoutTransaction()");
 		EntityManager em = EMF.get().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		List<Book> books = transaction.getBooks();
 		List<Book> checkoutbooks = getCheckoutBooks(books, transaction.getPatron());
-		List<Book> waitlistBooks = getWaitlistBooks(books);
+		List<Book> waitlistBooks = getWaitlistBooks(books, transaction.getPatron());
 		tx.begin();
 		StringBuilder mailContents = new StringBuilder();
 		mailContents.append("Hi, " + transaction.getPatron().getPatron_name() + ", \r");
@@ -156,21 +166,25 @@ public class TransactionDAOImpl implements TransactionDAO {
 				"Thank you for using Team - 13 Library Management System. Here's the summary of your recent transaction: \r\r");
 		mailContents.append("\r\r Transaction Date: " + new java.util.Date().toLocaleString());
 		try {
+			System.out.println("In try - checkout");
 			int i = 1;
 			for (Book book : checkoutbooks) {
 				IssueBook issue = prepareIssueBook(book, transaction.getPatron().getPatron_id());
 				Reservation res = getReserved(book, transaction.getPatron().getPatron_id()); 
 				if (null != res) {
-					book.setAvailable_copies(book.getAvailable_copies() - 1);
-				} else {
 					res.setChecked_out(true);
+				} else {
+					book.setAvailable_copies(book.getAvailable_copies() - 1);
+					System.out.println(" No Reservation");
 				}
 				if (book.getAvailable_copies() == 0) {
 					book.setBook_status(BookStatus.WAITLIST);
 				}
 				em.merge(issue);
 				em.merge(book);
-				em.merge(res);
+				if(null != res) {
+					em.merge(res);
+				}
 				mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
 						+ issue.getId().getIssue_date().toLocaleString() + "\t\t Due Date: "
 						+ issue.getDue_date().toLocaleString());
@@ -189,6 +203,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 			sendMail(transaction.getPatron().getPatron_email(),
 					"Team - 13 - Library Management - Summary of recent checkout transaction", mailContents.toString());
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 			tx.rollback();
 		} finally {
@@ -198,13 +213,14 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	private Reservation getReserved(Book book, int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
-		Query query = em.createQuery("select e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = FALSE");
+		Query query = em.createQuery("select e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = false");
 		query.setParameter("isbn", book.getIsbn());
 		query.setParameter("p_id", patron_id);
 		Reservation res = null;
 		try {
 			res = (Reservation) query.getSingleResult();
 		} catch (NoResultException e) {
+			System.out.println("No Reservation found!");
 			return null;
 		}
 		return res;
@@ -231,10 +247,10 @@ public class TransactionDAOImpl implements TransactionDAO {
 	 * @param books
 	 * @return
 	 */
-	private List<Book> getWaitlistBooks(List<Book> books) {
+	private List<Book> getWaitlistBooks(List<Book> books, Patron patron) {
 		List<Book> checkoutbook = new ArrayList<Book>(0);
 		for (Book book : books) {
-			if (book.getBook_status() == BookStatus.WAITLIST) {
+			if (book.getBook_status() == BookStatus.WAITLIST && !isReserved(book, patron)) {
 				checkoutbook.add(book);
 			}
 		}
@@ -282,7 +298,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		cal.setTime(issue_date);
 		cal.add(Calendar.DATE, 30);
 		Timestamp due_date = new Timestamp(cal.getTime().getTime());
-		IssueBook issue = new IssueBook(new IssueBookID(book.getIsbn(), patron_id, issue_date), due_date, null);
+		IssueBook issue = new IssueBook(new IssueBookID(book.getIsbn(), patron_id, issue_date), due_date, null, 0);
 		return issue;
 	}
 

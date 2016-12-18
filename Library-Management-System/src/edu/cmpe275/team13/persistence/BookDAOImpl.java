@@ -118,10 +118,10 @@ public class BookDAOImpl implements BookDAO {
 		boolean isbn_set = false, author_name_set = false, title_set = false, publisher_name_set = false,
 				year_set = false, updated_by_set = false, created_by_set = false, is = false, keywords_set = false,
 				book_status_set = false;
-		String queryString = "SELECT e FROM Book e where ";
+		String queryString = "SELECT e FROM Book e ";
 		if (bookSpec.getIsbn() != null) {
 			if (!is) {
-				queryString += " e.isbn = :isbn ";
+				queryString += "where e.isbn = :isbn ";
 				is = !is;
 			} else {
 				queryString += " AND e.isbn = :isbn ";
@@ -130,7 +130,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getAuthor_name() != null && bookSpec.getAuthor_name().length() != 0) {
 			if (!is) {
-				queryString += " e.author_name like :author_name";
+				queryString += "where e.author_name like :author_name";
 				is = !is;
 			} else {
 				queryString += " AND e.author_name like :author_name";
@@ -139,7 +139,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getTitle() != null && bookSpec.getTitle().length() != 0) {
 			if (!is) {
-				queryString += " e.title like :title";
+				queryString += "where e.title like :title";
 				is = !is;
 			} else {
 				queryString += " AND e.title like :title";
@@ -148,7 +148,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getPublisher_name() != null && bookSpec.getPublisher_name().length() != 0) {
 			if (!is) {
-				queryString += " e.publisher_name like :publisher_name";
+				queryString += "where e.publisher_name like :publisher_name";
 				is = !is;
 			} else {
 				queryString += " AND e.publisher_name like :publisher_name";
@@ -157,7 +157,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getYear_of_publication() != null) {
 			if (!is) {
-				queryString += " e.year_of_publication = :year";
+				queryString += "where e.year_of_publication = :year";
 				is = !is;
 			} else {
 				queryString += " AND e.year_of_publication = :year";
@@ -166,7 +166,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if(bookSpec.getBook_status() != Integer.MIN_VALUE) {
 			if (!is) {
-				queryString += " e.book_status = :book_status";
+				queryString += "where e.book_status = :book_status";
 				is = !is;
 			} else {
 				queryString += " AND e.book_status = :book_status";
@@ -175,7 +175,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getUpdated_by() != Integer.MIN_VALUE) {
 			if (!is) {
-				queryString += " e.updated_by = :updated_by";
+				queryString += "where e.updated_by = :updated_by";
 				is = !is;
 			} else {
 				queryString += " AND e.updated_by = :updated_by";
@@ -184,7 +184,7 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getCreated_by() != Integer.MIN_VALUE) {
 			if (!is) {
-				queryString += " e.created_by = :created_by";
+				queryString += "where e.created_by = :created_by";
 				is = !is;
 			} else {
 				queryString += " AND e.created_by = :created_by";
@@ -193,12 +193,12 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (bookSpec.getKeywords() != null && bookSpec.getKeywords().length > 0) {
 			String kywrdstrng = " e.keywords like :keyword0 ";
-			for (int i = 1; i < bookSpec.getKeywords().length; i++) {
+			for (int i = 1; i < bookSpec.getKeywords().length - 1; i++) {
 				kywrdstrng += " OR e.keywords like :keyword" + i + " ";
 			}
 			//kywrdstrng += " )";
 			if (!is) {
-				queryString += kywrdstrng;
+				queryString += "where " + kywrdstrng;
 				is = !is;
 			} else {
 				queryString += " AND " + kywrdstrng;
@@ -206,6 +206,7 @@ public class BookDAOImpl implements BookDAO {
 			keywords_set = true;
 		}
 		Query query = em.createQuery(queryString);
+		System.out.println(queryString);
 		if (isbn_set) {
 			query.setParameter("isbn", bookSpec.getIsbn());
 		}
@@ -232,10 +233,11 @@ public class BookDAOImpl implements BookDAO {
 		}
 		if (keywords_set) {
 			String[] keywords = bookSpec.getKeywords();
-			for (int i = 0; i < keywords.length; i++) {
-				query.setParameter("keyword" + i, "%" + keywords[i] +"%");
+			for (int i = 0; i < keywords.length - 1; i++) {
+				query.setParameter("keyword" + i, "%" + keywords[i + 1] +"%");
 			}
 		}
+		System.out.println(query.toString());
 		@SuppressWarnings("unchecked")
 		List<Book> list = query.getResultList();
 		for (Book book : list) {
