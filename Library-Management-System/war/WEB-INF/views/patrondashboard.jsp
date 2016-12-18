@@ -20,7 +20,7 @@
 	request.setAttribute("books", null);
 	request.setAttribute("issue_books", null);
 	if (issue_books.size() > 0) {
-		sb.append("<table><tr><th> Book </th><th> Title </th><th> Issue Date </th> <th> Due Date </th> <th></th></tr>");
+		sb.append("<table class=\"table table-bordered\"><tr><th> Book </th><th> Title </th><th> Issue Date </th> <th> Due Date </th> <th></th></tr>");
 		for (IssueBook issuebook : issue_books) {
 			for (Book book : books) {
 				if (issuebook.getId().getIsbn().equals(book.getIsbn())) {
@@ -28,7 +28,7 @@
 					sb.append("<td>" + book.getTitle() + "</td>");
 					sb.append("<td>" + issuebook.getId().getIssue_date().toLocaleString() + "</td>");
 					sb.append("<td>" + issuebook.getDue_date().toLocaleString() + "</td>");
-					String input = "<button class=\"return\" id=\"return_" + book.getIsbn() + "\"> Add to return list </button>";
+					String input = "<button class=\"return\" class=\"btn btn-danger\" id=\"return_" + book.getIsbn() + "\"> Add to return list </button>";
 					sb.append("<td>" + input + "</td></tr>");
 				}
 			}
@@ -61,7 +61,7 @@
 	});
 	</script>
 	
-	<form action="/transaction/return" method="GET">	<input type="submit" value="Return"/></form>
+	<form action="/transaction/return" method="GET">	<input class="btn btn-link" type="submit" value="Return"/></form>
 	
 	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/books/search/">Search</a>
 	

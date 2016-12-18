@@ -1,7 +1,6 @@
 package edu.cmpe275.team13.beans;
 
 import java.sql.Date;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -41,7 +40,7 @@ public class Book {
 	private Date year_of_publication;
 	private String location_in_library;
 	private int number_of_copies;
-	private boolean book_status;
+	private int book_status;
 	private String image;
 	private int available_copies;
 	private int created_by;
@@ -57,7 +56,7 @@ public class Book {
 		this.year_of_publication = new Date(0);
 		this.location_in_library = null;
 		this.number_of_copies = 0;
-		this.book_status = false;
+		this.book_status = 0;
 		this.image = null;
 		this.available_copies = 0;
 		this.created_by = 0;
@@ -67,7 +66,7 @@ public class Book {
 
 	public Book(Long isbn, String author_name, String title, String call_number, 
 			String publisher_name, Date year_of_publication, String location_in_library,
-			int number_of_copies, boolean book_status, String image, 
+			int number_of_copies, int book_status, String image, 
 			int available_copies, int created_by, int updated_by,
 			String keywords) {
 		super();
@@ -202,14 +201,14 @@ public class Book {
 	/**
 	 * @return the book_status
 	 */
-	public boolean isBook_status() {
+	public int getBook_status() {
 		return book_status;
 	}
 
 	/**
 	 * @param book_status the book_status to set
 	 */
-	public void setBook_status(boolean book_status) {
+	public void setBook_status(int book_status) {
 		this.book_status = book_status;
 	}
 

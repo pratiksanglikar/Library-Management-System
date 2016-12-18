@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import org.springframework.stereotype.Service;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.IssueBookID;
 import edu.cmpe275.team13.beans.Patron;
@@ -59,7 +60,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 			for (Book book : books) {
 				book.setAvailable_copies(book.getAvailable_copies() + 1);
 				if (book.getAvailable_copies() > 0) {
-					book.setBook_status(true);
+					// TODO check if there is a waitlist and set status to reserved.
+					book.setBook_status(BookStatus.AVAILABLE);
 				}
 				em.merge(book);
 			}
@@ -105,7 +107,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				IssueBook issue = prepareIssueBook(book, transaction.getPatron().getPatron_id());
 				book.setAvailable_copies(book.getAvailable_copies() - 1);
 				if (book.getAvailable_copies() == 0) {
-					book.setBook_status(false);
+					book.setBook_status(BookStatus.WAITLIST);
 				}
 				em.merge(issue);
 				em.merge(book);

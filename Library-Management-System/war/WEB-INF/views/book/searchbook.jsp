@@ -58,7 +58,7 @@
 			</tr>
 			<tr>
 				<td><label>Book Status</label></td>
-				<td><input name="book_status" value="true"></td>
+				<td><input name="book_status" value="${bs.book_status}"></td>
 			</tr>
 			<!-- created by must be set by the librarian logged into the system -->
 			<c:set var="bool_val"><%=isLibrarian %></c:set>

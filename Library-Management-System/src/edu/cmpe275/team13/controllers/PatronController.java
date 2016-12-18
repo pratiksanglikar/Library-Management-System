@@ -40,7 +40,7 @@ public class PatronController {
 	public String logout(HttpSession session) {
 		if (session != null)
 			session.invalidate();
-		return "home";
+		return "patronLogin";
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -123,7 +123,7 @@ public class PatronController {
 				libDao.createLibrarian(librarian);
 			} else {
 				model.addAttribute("error", "This email already exist!");
-				return "librariansignup";
+				return "signUp";
 			}
 			String link = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/librarianActivationlink?key=";
 			String s = librarian.getLibrarian_id() + ":" + librarian.getLibrarian_email() + ":" + "shrutSalt";
@@ -158,7 +158,7 @@ public class PatronController {
 			}
 		}
 
-		return "home";
+		return "login";
 	}
 
 	@RequestMapping(value = "/activationlink", method = RequestMethod.GET)

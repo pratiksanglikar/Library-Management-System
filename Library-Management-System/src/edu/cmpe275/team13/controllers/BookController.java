@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;
@@ -144,7 +145,7 @@ public class BookController {
 		int updated_by = (map.get("updated_by") == null || map.get("updated_by").trim().length() == 0) ? Integer.MIN_VALUE : Integer.parseInt(map.get("updated_by"));
 		Long isbn = (map.get("isbn") == null || map.get("isbn").trim().length() == 0) ? null : Long.parseLong(map.get("isbn"));
 		Date year = (map.get("year_of_publication") == null || map.get("year_of_publication").trim().length() == 0) ? null : Date.valueOf(map.get("year_of_publication"));
-		boolean status = (map.get("book_status") == null || map.get("book_status").trim().length() == 0) ? true : ((map.get("book_status").trim().equalsIgnoreCase("false") ? false : true));
+		int status = (map.get("book_status") == null || map.get("book_status").trim().length() == 0) ? BookStatus.AVAILABLE : Integer.parseInt(map.get("book_status"));
 		String[] keywords = (map.get("keywords") == null || map.get("keywords").trim().length() == 0) ? null : (";" + map.get("keywords")).split(";");
 		BookSearch booksearch = new BookSearch(map.get("title").trim(), map.get("author_name").trim(), map.get("publisher_name").trim(),
 				isbn, year, status, created_by, updated_by, keywords);

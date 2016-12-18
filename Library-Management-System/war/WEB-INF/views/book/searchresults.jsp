@@ -42,7 +42,19 @@
 		<h4>"${book.publisher_name}"</h4>
 		<h4>"${book.year_of_publication}"</h4>
 		<h4>"${book.location_in_library}"</h4>
-		<h4>"${book.book_status}"</h4>
+		<c:set var = "book_status" value = "${book.book_status }"></c:set>
+		<c:choose>
+			<c:when test = "${book_status == 0}">
+				<h4>Waitlist</h4>
+			</c:when>
+			<c:when test = "${book_status == 1}">
+				<h4>Available</h4>
+			</c:when>
+			<c:when test = "${book_status == 2}">
+				<h4>Reserved</h4>
+			</c:when>
+		</c:choose>
+		<%-- <h4>"${book.book_status}"</h4> --%>
 		<h4>"${book.keywords}"</h4>
 		<c:set var="bool_val"><%=isLibrarian%></c:set>
 		<c:choose>
@@ -53,8 +65,17 @@
 					Delete</button>
 			</c:when>
 			<c:otherwise>
-				<button class="addtocart" id="${book.isbn}_addtocart"
+				<c:choose>
+					<c:when test="${book_status == 0}">
+						<button class="joinwaitlist" id="${book.isbn}_joinwaitlist"
+					name="joinwaitlist">Join Waitlist</button>
+					</c:when>
+					<c:when test="${book_status == 1 || book_status == 2}">
+						<button class="addtocart" id="${book.isbn}_addtocart"
 					name="addtocart">Add to Cart</button>
+					</c:when>
+				</c:choose>
+				
 			</c:otherwise>
 		</c:choose>
 	</c:forEach>
@@ -93,10 +114,7 @@
 			$("#" + isbn + "_addtocart").attr("disabled","disabled");
 			$.get(url);
 		});
-		/* $("#checkout").click(function(event) {
-			var url = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/transaction/checkout";
-			$.get(url);
-		}); */
+		
 	</script>
 	<% String vari = "";
 	if(!isLibrarian) {

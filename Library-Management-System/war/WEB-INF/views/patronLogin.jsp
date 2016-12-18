@@ -8,16 +8,20 @@
 		<div align="center">
 			<table>
 				<tr>
-					<td>User Name</td>
-					<td><input type="text" name="email" /></td>
+				<div class="form-group">
+					<td><span class="form-control">Email ID</span></td>
+					<td><input class="form-control"  type="text" name="email" /></td>
+				</div>
 				</tr>
 				<tr>
-					<td>Password</td>
-					<td><input type="password" name="password" /></td>
+				<div class="form-group">
+					<td><span class="form-control">Password</span></td>
+					<td><input class="form-control"  type="password" name="password" /></td>
+				</div>
 				</tr>
 				<tr>
 					<td></td>
-					<td><button type="submit" value="Submit">Submit</button></td>
+					<td><button class="btn btn-primary" type="submit" value="Submit">Submit</button></td>
 				</tr>
 			</table>
 			<div style="color: red">${error}</div>

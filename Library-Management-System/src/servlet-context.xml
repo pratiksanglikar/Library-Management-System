@@ -6,12 +6,9 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
-
 	<annotation-driven />
 
-
 	<resources mapping="/resources/**" location="/resources/" />
-
 
 	<beans:bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -34,23 +31,4 @@
 			</beans:props>
 		</beans:property>
 	</beans:bean>
-
-
-
-	<!-- <tx:annotation-driven /> <beans:bean class="org.springframework.orm.jpa.JpaTransactionManager" 
-		id="transactionManager"> <beans:property name="entityManagerFactory" ref="entityManagerFactory" 
-		/> </beans:bean> This defines the entity manager factory with some custom 
-		properties <beans:bean id='entityManagerFactory' class='org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean'> 
-		<beans:property name="persistenceUnitName" value="cmpe275-lab2" /> <beans:property 
-		name='dataSource' ref='dataSource' /> <beans:property name="jpaPropertyMap"> 
-		<beans:map> <beans:entry key="eclipselink.weaving" value="false" /> </beans:map> 
-		</beans:property> </beans:bean> -->
-
-
-
-
-
-	<!-- <context:component-scan base-package="edu.cmpe275.team13">
-
-	</context:component-scan> -->
 </beans:beans>

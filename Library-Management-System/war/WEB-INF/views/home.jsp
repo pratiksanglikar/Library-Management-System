@@ -1,38 +1,53 @@
 <html>
 <head>
 <title>Home</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
 </head>
 <body>
+	<form class="pull-right" action="/login" method="GET">
+		<input class="btn btn-info" type="submit" value="Login">
+	</form>
 	<form action="/signUp" method="POST">
 		<div align="center">
 			<table>
 				<tr>
-					<td>User Name</td>
-					<td><input type="email" name="email" /></td>
+					<div class="form-group">
+					<td><span class="form-control">Email ID</span></td>
+					<td><input class="form-control" type="email" name="email" />
+					</td>
+					</div>
 				</tr>
 				<tr>
-					<td>Password</td>
-					<td><input type="password" name="password" /></td>
+					<div class="form-group">
+					<td><span class="form-control">Password</span></td>
+					<td><input class="form-control" type="password"
+						name="password" /></td>
+					</div>
 				</tr>
 				<tr>
-					<td>Name</td>
-					<td><input type="text" name="name" /></td>
+					<div class="form-group">
+					<td><span class="form-control">Name</span></td>
+					<td><input class="form-control" type="text" name="name" /></td>
+					</div>
 				</tr>
 				<tr>
-					<td>Student ID</td>
-					<td><input type="text" name="studentid" /></td>
+					<div class="form-group">
+					<td><span class="form-control">Student ID</span></td>
+					<td><input class="form-control" type="text" name="studentid" /></td>
+					</div>
 				</tr>
-
-
 				<tr>
+					<br><br>
 					<td></td>
-					<td><button type="submit" value="Submit">Submit</button></td>
+					<td><button class="btn btn-primary" type="submit" value="Submit">Submit</button></td>
 				</tr>
 			</table>
 			<div style="color: red">${error}</div>
 		</div>
 	</form>
-	<form action="/login" method="GET"><input type="submit" value="Login"></form>
+	
 </body>
 </html>
