@@ -89,5 +89,6 @@
 		}
 	%>
 	<%=string %>
+	<input type="submit" onclick="location.href='/changeSettings'" value="Change Settings" />
 </body>
 </html>

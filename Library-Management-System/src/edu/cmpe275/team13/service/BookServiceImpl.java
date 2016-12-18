@@ -49,8 +49,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public List<Book> searchBySpec(BookSearch bookSpec) {
-		return bookDAO.searchBySpec(bookSpec);
+	public List<Book> searchBySpec(BookSearch bookSpec, int patron_id) {
+		return bookDAO.searchBySpec(bookSpec, patron_id);
 	}
 
 }

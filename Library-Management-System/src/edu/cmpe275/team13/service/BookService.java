@@ -18,5 +18,5 @@ public interface BookService {
 
 	public void removeBook(Long isbn);
 
-	public List<Book> searchBySpec(BookSearch booksearch);
+	public List<Book> searchBySpec(BookSearch booksearch, int patron_id);
 }

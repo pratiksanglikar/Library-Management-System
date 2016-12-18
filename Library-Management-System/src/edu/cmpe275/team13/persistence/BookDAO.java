@@ -18,6 +18,6 @@ public interface BookDAO {
 
 	public void removeBook(Long isbn);
 
-	public List<Book> searchBySpec(BookSearch bookSpec);
+	public List<Book> searchBySpec(BookSearch bookSpec, int patron_id);
 	
 }

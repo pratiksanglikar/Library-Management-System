@@ -17,25 +17,37 @@
 	Patron patron = (Patron) session.getAttribute("user");
 	List<IssueBook> issue_books = (List<IssueBook>) request.getAttribute("issue_books");
 	List<Book> books = (List<Book>) request.getAttribute("books");
+	List<Book> waitlist = (List<Book>) request.getAttribute("waitlist");
 	request.setAttribute("books", null);
 	request.setAttribute("issue_books", null);
 	if (issue_books.size() > 0) {
 		sb.append("<table class=\"table table-bordered\"><tr><th> Book </th><th> Title </th><th> Issue Date </th> <th> Due Date </th> <th></th></tr>");
 		for (IssueBook issuebook : issue_books) {
-			for (Book book : books) {
-				if (issuebook.getId().getIsbn().equals(book.getIsbn())) {
-					sb.append("<tr><td><img src=\"" + book.getImage() + "\"></td>");
-					sb.append("<td>" + book.getTitle() + "</td>");
-					sb.append("<td>" + issuebook.getId().getIssue_date().toLocaleString() + "</td>");
-					sb.append("<td>" + issuebook.getDue_date().toLocaleString() + "</td>");
-					String input = "<button class=\"return\" class=\"btn btn-danger\" id=\"return_" + book.getIsbn() + "\"> Add to return list </button>";
-					sb.append("<td>" + input + "</td></tr>");
-				}
-			}
+	for (Book book : books) {
+		if (issuebook.getId().getIsbn().equals(book.getIsbn())) {
+			sb.append("<tr><td><img src=\"" + book.getImage() + "\"></td>");
+			sb.append("<td>" + book.getTitle() + "</td>");
+			sb.append("<td>" + issuebook.getId().getIssue_date().toLocaleString() + "</td>");
+			sb.append("<td>" + issuebook.getDue_date().toLocaleString() + "</td>");
+			String input = "<button class=\"return\" class=\"btn btn-danger\" id=\"return_" + book.getIsbn() + "\"> Add to return list </button>";
+			sb.append("<td>" + input + "</td></tr>");
+		}
+	}
 		}
 		sb.append("</table>");
 	} else {
 		sb.append("No books issued as of now!");
+	}
+	sb.append("<h3>Books currently in your waitlist - </h3>");
+	if (waitlist.size() > 0) {
+		sb.append("<table class=\"table table-bordered\"><tr><th> Book </th><th> Title </th></tr>");
+		for (Book book : waitlist) {
+				sb.append("<tr><td><img src=\"" + book.getImage() + "\"></td>");
+				sb.append("<td>" + book.getTitle() + "</td> </tr>");
+		}
+		sb.append("</table>");
+	} else {
+		sb.append("No books in the waitlist!");
 	}
 %>
 <body>

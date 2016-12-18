@@ -13,6 +13,8 @@
         <class>edu.cmpe275.team13.beans.IssueBookID</class>
         <class>edu.cmpe275.team13.beans.WaitlistId</class>
         <class>edu.cmpe275.team13.beans.Waitlist</class>
+        <class>edu.cmpe275.team13.beans.ReservationId</class>
+        <class>edu.cmpe275.team13.beans.Reservation</class>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>
             <property name="datanucleus.NontransactionalWrite" value="true"/>

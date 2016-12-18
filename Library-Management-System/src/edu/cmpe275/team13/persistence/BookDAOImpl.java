@@ -7,11 +7,14 @@ import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Service;
 
 import edu.cmpe275.team13.beans.Book;
+import edu.cmpe275.team13.beans.BookStatus;
+import edu.cmpe275.team13.beans.Reservation;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.DeleteBookNotPermitted;
 import edu.cmpe275.team13.search.BookSearch;
@@ -107,13 +110,14 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public List<Book> searchBySpec(BookSearch bookSpec) {
+	public List<Book> searchBySpec(BookSearch bookSpec, int patron_id) {
 		if (null == bookSpec) {
 			return new ArrayList<Book>(0);
 		}
 		EntityManager em = EMF.get().createEntityManager();
 		boolean isbn_set = false, author_name_set = false, title_set = false, publisher_name_set = false,
-				year_set = false, updated_by_set = false, created_by_set = false, is = false, keywords_set = false;
+				year_set = false, updated_by_set = false, created_by_set = false, is = false, keywords_set = false,
+				book_status_set = false;
 		String queryString = "SELECT e FROM Book e where ";
 		if (bookSpec.getIsbn() != null) {
 			if (!is) {
@@ -160,11 +164,14 @@ public class BookDAOImpl implements BookDAO {
 			}
 			year_set = true;
 		}
-		if (!is) {
-			queryString += " e.book_status = :book_status";
-			is = !is;
-		} else {
-			queryString += " AND e.book_status = :book_status";
+		if(bookSpec.getBook_status() != Integer.MIN_VALUE) {
+			if (!is) {
+				queryString += " e.book_status = :book_status";
+				is = !is;
+			} else {
+				queryString += " AND e.book_status = :book_status";
+			}
+			book_status_set = true;
 		}
 		if (bookSpec.getUpdated_by() != Integer.MIN_VALUE) {
 			if (!is) {
@@ -214,7 +221,9 @@ public class BookDAOImpl implements BookDAO {
 		if (year_set) {
 			query.setParameter("year", bookSpec.getYear_of_publication());
 		}
-		query.setParameter("book_status", bookSpec.getBook_status());
+		if(book_status_set) {
+			query.setParameter("book_status", bookSpec.getBook_status());
+		}
 		if (created_by_set) {
 			query.setParameter("created_by", bookSpec.getCreated_by());
 		}
@@ -229,6 +238,20 @@ public class BookDAOImpl implements BookDAO {
 		}
 		@SuppressWarnings("unchecked")
 		List<Book> list = query.getResultList();
+		for (Book book : list) {
+			Query query1 = em.createQuery("SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid AND e.checked_out = FALSE");
+			query1.setParameter("isbn", book.getIsbn());
+			query1.setParameter("pid", patron_id);
+			Reservation  res = null;
+			try {
+				res = (Reservation) query1.getSingleResult(); 
+			} catch(NoResultException e) {
+				// DO NOTHING
+			}
+			if(null != res) {
+				book.setBook_status(BookStatus.RESERVED);
+			}
+		}
 		em.close();
 		return list;
 	}

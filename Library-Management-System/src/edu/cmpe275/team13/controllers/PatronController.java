@@ -2,6 +2,9 @@ package edu.cmpe275.team13.controllers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.cmpe275.team13.beans.ApplicationSettings;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.persistence.LibrarianDAOImpl;
@@ -158,7 +162,7 @@ public class PatronController {
 			}
 		}
 
-		return "login";
+		return "home";
 	}
 
 	@RequestMapping(value = "/activationlink", method = RequestMethod.GET)
@@ -191,6 +195,38 @@ public class PatronController {
 			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
 		}
 		return sb.toString();
+	}
+
+	@RequestMapping(value = "/changeSettings", method = RequestMethod.GET)
+	public String modifyDateSteeings(Model model) {
+		ApplicationSettings appset = new ApplicationSettings();
+		java.util.Date today = new java.util.Date();
+
+		Date changedDate = new Date(today.getTime());
+
+		appset.setAppDate(changedDate);
+
+		model.addAttribute("date", appset.getDate());
+		return "settings";
+	}
+
+	@RequestMapping(value = "/changeDate", method = RequestMethod.POST)
+	public String modifyDate(@RequestParam("changedDate") String date, Model model) {
+
+		System.out.println("datee :" + date);
+		ApplicationSettings appset = new ApplicationSettings();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+		Date changedDate = null;
+		try {
+			changedDate = new Date(dateFormat.parse(date).getTime());
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		appset.setAppDate(changedDate);
+		model.addAttribute("date", appset.getDate());
+		return "settings";
 	}
 
 }

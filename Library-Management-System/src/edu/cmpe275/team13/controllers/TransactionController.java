@@ -14,10 +14,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import edu.cmpe275.team13.beans.ApplicationSettings;
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.beans.Transaction;
+import edu.cmpe275.team13.beans.Waitlist;
 import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;
 import edu.cmpe275.team13.persistence.PatronDAOImpl;
 import edu.cmpe275.team13.service.BookService;
@@ -35,6 +37,9 @@ public class TransactionController {
 
 	@Autowired
 	private PatronDAOImpl patronService;
+	
+	@Autowired
+	private ApplicationSettings appSettings;
 
 	@RequestMapping(value = "/return", method = RequestMethod.GET)
 	public String returnBooks(HttpSession session) {
@@ -86,10 +91,23 @@ public class TransactionController {
 		Patron patron = this.patronService.getPatron(patron_id);
 		List<IssueBook> issue_books = this.transactionService.getPendingBooks(patron_id);
 		List<Book> books = prepareBooks(issue_books);
+		List<Book> waitlisted_books = getWaitlistedBooks(patron_id);
 		model.addAttribute("patron", patron);
 		model.addAttribute("issue_books", issue_books);
 		model.addAttribute("books", books);
+		model.addAttribute("waitlist", waitlisted_books);
+		model.addAttribute("date", appSettings.getDate());
+		System.out.println(appSettings.getDate());
 		return "patrondashboard";
+	}
+
+	private List<Book> getWaitlistedBooks(int patron_id) {
+		List<Waitlist> waitlisted = this.transactionService.getWaitlistedBooks(patron_id);
+		List<Book> books = new ArrayList<Book>(0);
+		for (Waitlist waitlist : waitlisted) {
+			books.add(this.bookservice.getBookById(waitlist.getId().getIsbn()));
+		}
+		return books;
 	}
 
 	private List<Book> prepareBooks(List<IssueBook> issue_books) {

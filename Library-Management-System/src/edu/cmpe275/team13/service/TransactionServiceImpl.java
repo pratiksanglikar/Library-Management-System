@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.Transaction;
+import edu.cmpe275.team13.beans.Waitlist;
 import edu.cmpe275.team13.exceptions.TransactionLimitExceededException;
 import edu.cmpe275.team13.persistence.TransactionDAO;
 
@@ -42,5 +43,10 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public List<IssueBook> getPendingBooks(int patron_id) {
 		return this.transacationDAO.getPendingBooks(patron_id);
+	}
+
+	@Override
+	public List<Waitlist> getWaitlistedBooks(int patron_id) {
+		return this.transacationDAO.getWaitlistedBooks(patron_id);
 	}
 }

@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="edu.cmpe275.team13.beans.*"%>
 <%@ page import="java.util.List"%>
+<%@ page import="java.sql.Date"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -67,8 +68,8 @@
 			<c:otherwise>
 				<c:choose>
 					<c:when test="${book_status == 0}">
-						<button class="joinwaitlist" id="${book.isbn}_joinwaitlist"
-					name="joinwaitlist">Join Waitlist</button>
+						<button class="addtocart" id="${book.isbn}_addtocart"
+					name="addtocart">Join Waitlist</button>
 					</c:when>
 					<c:when test="${book_status == 1 || book_status == 2}">
 						<button class="addtocart" id="${book.isbn}_addtocart"
@@ -121,5 +122,6 @@
 		vari += "<form action=\"/transaction/checkout\" method=\"GET\">	<input type=\"submit\" value=\"Checkout\"/></form>";
 	}%>
 	<%=vari %>
+	
 </body>
 </html>
