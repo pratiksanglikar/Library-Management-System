@@ -14,10 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.exceptions.PatronNotFoundException;
 
+/**
+ * DAO layer implementation for Patron.
+ */
 @Service
 @Repository
 public class PatronDAOImpl {
 	
+	/**
+	 * adds the patron in the system
+	 * @param patron
+	 */
 	@Transactional
 	public void createPatron(Patron patron) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -26,6 +33,11 @@ public class PatronDAOImpl {
 		em.getTransaction().commit();
 	}
 
+	/**
+	 * checks whether the patron is present in the system
+	 * @param patron
+	 * @return
+	 */
 	@Transactional
 	public boolean isPatronPresent(Patron patron) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -39,6 +51,12 @@ public class PatronDAOImpl {
 		return false;
 	}
 	
+	/**
+	 * validates the patron account.
+	 * @param username
+	 * @param password
+	 * @return
+	 */
 	@Transactional
 	public Patron validatePatron(String username, String password) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -63,6 +81,11 @@ public class PatronDAOImpl {
 		return null;
 	}
 
+	/**
+	 * get patron account by id
+	 * @param patron_id
+	 * @return
+	 */
 	@Transactional
 	public Patron getPatron(int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -73,6 +96,10 @@ public class PatronDAOImpl {
 		return patron;
 	}
 
+	/**
+	 * updates the patron
+	 * @param patron
+	 */
 	@Transactional
 	public void updatePatron(Patron patron) {
 		EntityManager em = EMF.get().createEntityManager();

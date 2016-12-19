@@ -27,6 +27,10 @@ import edu.cmpe275.team13.persistence.PatronDAOImpl;
 import edu.cmpe275.team13.service.BookService;
 import edu.cmpe275.team13.service.TransactionService;
 
+/**
+ * This controller handles all the operations related to book transactions.
+ * CHeckout, return, waitlist etc.
+ */
 @Controller
 @RequestMapping(value = "/transaction")
 public class TransactionController {
@@ -43,6 +47,11 @@ public class TransactionController {
 	@Autowired
 	private AppSettings appSettings;
 
+	/**
+	 * return the books.
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/return", method = RequestMethod.GET)
 	public String returnBooks(HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -62,20 +71,31 @@ public class TransactionController {
 		return "redirect:/transaction/summary";
 	}
 	
+	/**
+	 * cron job to check if the reservation is expired.
+	 * @return
+	 */
 	@RequestMapping(value = "/updatereservation", method = RequestMethod.GET)
 	public ResponseEntity<Void> updateReservations2() {
 		this.transactionService.updateReservations();
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
+	/**
+	 * cron job to send the email updates when book is due.
+	 * @return
+	 */
 	@RequestMapping(value = "/emailupdates", method = RequestMethod.GET)
 	public ResponseEntity<Void> updateEmail() {
 		this.transactionService.updateEmail();
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	
-	
-
+	/**
+	 * check out the books
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/checkout", method = RequestMethod.GET)
 	public String checkoutBooks(HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -95,6 +115,12 @@ public class TransactionController {
 		return "redirect:/transaction/summary";
 	}
 	
+	/**
+	 * return summary of the patron
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/summary", method = RequestMethod.GET)
 	public String getSummary(HttpSession session, Model model) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -117,6 +143,11 @@ public class TransactionController {
 		return "patrondashboard";
 	}
 
+	/**
+	 * returns the waitlisted books.
+	 * @param patron_id
+	 * @return
+	 */
 	private List<Book> getWaitlistedBooks(int patron_id) {
 		List<Waitlist> waitlisted = this.transactionService.getWaitlistedBooks(patron_id);
 		List<Book> books = new ArrayList<Book>(0);
@@ -126,6 +157,11 @@ public class TransactionController {
 		return books;
 	}
 
+	/**
+	 * returns the issued books.
+	 * @param issue_books
+	 * @return
+	 */
 	private List<Book> prepareBooks(List<IssueBook> issue_books) {
 		List<Book> books = new ArrayList<Book>(0);
 		for (IssueBook issueBook : issue_books) {
@@ -134,6 +170,13 @@ public class TransactionController {
 		return books;
 	}
 
+	/**
+	 * prepares the checkout or return transactions.
+	 * @param patron
+	 * @param book_list
+	 * @param isCheckout
+	 * @return
+	 */
 	private Transaction prepareTransaction(Patron patron, List<Long> book_list, boolean isCheckout) {
 		List<Book> books = new ArrayList<Book>(0);
 		for (Long isbn : book_list) {

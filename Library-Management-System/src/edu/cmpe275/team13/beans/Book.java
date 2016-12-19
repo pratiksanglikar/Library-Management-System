@@ -6,25 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/*
- * CREATE TABLE book(
- * 		isbn INT(13), 
- * 		author_name VARCHAR(255) NOT NULL, 
- * 		title VARCHAR(255) NOT NULL, 
- * 		call_number VARCHAR(150), 
- * 		publisher_name VARCHAR(255) NOT NULL, 
- * 		year_of_publication DATE, 
- * 		location_in_library VARCHAR(255) NOT NULL, 
- * 		number_of_copies INT NOT NULL, 
- * 		book_status BOOLEAN , 
- * 		image VARCHAR(255), 
- * 		available_copies INT NOT NULL, 
- * 		created_by INT NOT NULL, 
- * 		updated_by INT, 
- * 		keywords VARCHAR2(50),
- * 		PRIMARY KEY(isbn), 
- * 		FOREIGN KEY(created_by) REFERENCES librarian(librarian_id) ON DELETE NO ACTION,
- * 		FOREIGN KEY(updated_by) REFERENCES librarian(librarian_id) ON DELETE SET NULL); 
+/**
+ * This class is the bean definition for the Book object.
  */
 @Entity
 @Table(name = "book")
@@ -64,6 +47,23 @@ public class Book {
 		this.keywords = null;
 	}
 
+	/**
+	 * public constructor.
+	 * @param isbn
+	 * @param author_name
+	 * @param title
+	 * @param call_number
+	 * @param publisher_name
+	 * @param year_of_publication
+	 * @param location_in_library
+	 * @param number_of_copies
+	 * @param book_status
+	 * @param image
+	 * @param available_copies
+	 * @param created_by
+	 * @param updated_by
+	 * @param keywords
+	 */
 	public Book(Long isbn, String author_name, String title, String call_number, 
 			String publisher_name, Date year_of_publication, String location_in_library,
 			int number_of_copies, int book_status, String image, 

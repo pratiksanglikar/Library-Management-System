@@ -7,27 +7,25 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- *CREATE TABLE librarian (
- *		librarian_email VARCHAR(50) UNIQUE NOT NULL, 
- *		librarian_password VARCHAR(65) NOT NULL, 
- *		librarian_name VARCHAR(255) NOT NULL, 
- *		librarian_id INT(6), 
- *		librarian_verified BOOLEAN DEFAULT 0, 
- *		PRIMARY KEY(librarian_id)); 
+ * This class represents the Bean for Librarian object in the system.
  */
 @Entity
 @Table(name = "librarian")
 public class Librarian implements Serializable {
 	
 	private static final long serialVersionUID = -3748073777433741113L;
-	private String librarian_email;
-	private String librarian_password;
-	private String librarian_name;
 	
 	@Id
 	private int librarian_id;
+	
+	private String librarian_email;
+	private String librarian_password;
+	private String librarian_name;
 	private boolean librarian_verified;
 	
+	/**
+	 * 
+	 */
 	public Librarian() {
 		this.librarian_email = null;
 		this.librarian_password = null;

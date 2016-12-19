@@ -27,6 +27,9 @@ import edu.cmpe275.team13.search.BookSearch;
 import edu.cmpe275.team13.service.BookService;
 import edu.cmpe275.team13.service.TransactionService;
 
+/**
+ * This controller is for handling transactions related to book.
+ */
 @Controller
 @RequestMapping(value = "/books")
 public class BookController {
@@ -55,6 +58,13 @@ public class BookController {
 		this.bookservice = bookservice;
 	}
 
+	/**
+	 * returns the book by id.
+	 * @param isbn
+	 * @param model
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.GET)
 	public String getBook(@PathVariable long isbn, Model model, HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -66,6 +76,13 @@ public class BookController {
 		return "book/showbook";
 	}
 
+	/**
+	 * get book by id for librarian.
+	 * @param isbn
+	 * @param model
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "librarian/{isbn}", method = RequestMethod.GET)
 	public String getBookLibrarian(@PathVariable long isbn, Model model, HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -80,6 +97,12 @@ public class BookController {
 		return "book/updatebook";
 	}
 
+	/**
+	 * Delete book by id. 
+	 * @param isbn
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.DELETE)
 	public String deleteBook(@PathVariable Long isbn, HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -92,6 +115,12 @@ public class BookController {
 		return "redirect:/index.jsp";
 	}
 	
+	/**
+	 * add the book to cart 
+	 * @param isbn
+	 * @param session
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/addtocart/{isbn}", method = RequestMethod.GET) 
 	public ResponseEntity<Void> addToCart(@PathVariable Long isbn, HttpSession session) {
@@ -108,6 +137,13 @@ public class BookController {
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
+	/**
+	 * update the book.
+	 * @param isbn
+	 * @param book
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/{isbn}", method = RequestMethod.POST)
 	public String updateBook(@PathVariable Long isbn, @ModelAttribute Book book, HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -134,6 +170,12 @@ public class BookController {
 		return "redirect:/books/search";
 	}
 
+	/**
+	 * list all books.
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public String listBooks(HttpSession session, Model model) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -146,6 +188,13 @@ public class BookController {
 		return "book/createbook";
 	}
 
+	/**
+	 * search book 
+	 * @param map
+	 * @param model
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/searchbook", method = RequestMethod.GET)
 	public String search(@RequestParam Map<String, String> map, Model model, HttpSession session) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -165,6 +214,12 @@ public class BookController {
 		return "book/searchresults";
 	}
 
+	/**
+	 * return search book page.
+	 * @param session
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	public String searchBook(HttpSession session, Model model) {
 		if(null == session || session.getAttribute("type") == null) {
@@ -174,7 +229,7 @@ public class BookController {
 		return "book/searchbook";
 	}
 
-	/*
+	/**
 	 * creates a new book in the system
 	 */
 	@RequestMapping(method = RequestMethod.POST)
@@ -185,11 +240,17 @@ public class BookController {
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
-		book.setCreated_by(((Librarian) session.getAttribute("librarian")).getLibrarian_id());
+		book.setCreated_by(((Librarian) session.getAttribute("user")).getLibrarian_id());
 		Long isbn = this.bookservice.addBook(book);
 		return "redirect:/books/" + isbn;
 	}
 	
+	/**
+	 * renews the book
+	 * @param isbn
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/renew/{isbn}")
 	public String renewBook(@PathVariable Long isbn, HttpSession session){
 		if(null == session || session.getAttribute("type") == null) {

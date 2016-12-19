@@ -8,6 +8,9 @@ import edu.cmpe275.team13.beans.Book;
 
 @javax.persistence.metamodel.StaticMetamodel(edu.cmpe275.team13.beans.Book.class)
 
+/**
+ * not used in production
+ */
 public class Book_ {
 	public static volatile SingularAttribute<Book, Long> isbn;
 	public static volatile SingularAttribute<Book, String> title;

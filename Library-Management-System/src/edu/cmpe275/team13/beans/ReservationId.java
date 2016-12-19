@@ -5,6 +5,9 @@ import java.sql.Timestamp;
 
 import javax.persistence.Embeddable;
 
+/**
+ * This class represents the EmbeddedId for the class Reservation.
+ */
 @Embeddable
 public class ReservationId implements Serializable {
 
@@ -14,12 +17,21 @@ public class ReservationId implements Serializable {
 	private int patron_id;
 	private Timestamp start_date;
 	
+	/**
+	 * default constructor for the system.
+	 */
 	public ReservationId() {
 		isbn = null;
 		patron_id = Integer.MIN_VALUE;
 		start_date = null;
 	}
 
+	/**
+	 * parameterized constructor for ReservationId
+	 * @param isbn
+	 * @param patron_id
+	 * @param start_date
+	 */
 	public ReservationId(Long isbn, int patron_id, Timestamp start_date) {
 		super();
 		this.isbn = isbn;

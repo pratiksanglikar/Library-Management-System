@@ -6,6 +6,9 @@ import java.sql.Timestamp;
 import javax.jdo.annotations.Column;
 import javax.persistence.Embeddable;
 
+/**
+ * An embeddedId for the class IssueBook.
+ */
 @Embeddable
 public class IssueBookID implements Serializable {
 	

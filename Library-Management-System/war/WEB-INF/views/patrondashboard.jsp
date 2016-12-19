@@ -38,12 +38,12 @@
 					sb.append("<td>" + book.getTitle() + "</td>");
 					sb.append("<td>" + issuebook.getId().getIssue_date().toLocaleString() + "</td>");
 					sb.append("<td>" + issuebook.getDue_date().toLocaleString() + "</td>");
-					String input = "<button class=\"return\" class=\"btn btn-danger\" id=\"return_"
+					String input = "<button class=\"return btn btn-warning\" id=\"return_"
 							+ book.getIsbn() + "\"> Add to return list </button>";
 					String input1 = "";
 					if (book.getBook_status() == BookStatus.AVAILABLE
 							&& issuebook.getDue_date().getTime() > new java.util.Date().getTime())
-						input1 = "<br><button class=\"renew\" class=\"btn btn-danger\" id=\"renew_"
+						input1 = "<br><button class=\"renew btn btn-success\"  id=\"renew_"
 								+ book.getIsbn() + "\"> Renew </button>";
 					sb.append("<td>" + input + input1 + "</td></tr>");
 				}

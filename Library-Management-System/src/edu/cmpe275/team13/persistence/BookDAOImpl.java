@@ -20,8 +20,12 @@ import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.Reservation;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.DeleteBookNotPermitted;
+import edu.cmpe275.team13.exceptions.DuplicateBookException;
 import edu.cmpe275.team13.search.BookSearch;
 
+/**
+ * Implementation of the BookDAO interface.
+ */
 @Service
 public class BookDAOImpl implements BookDAO {
 
@@ -35,7 +39,12 @@ public class BookDAOImpl implements BookDAO {
 	public Long addBook(Book book) {
 		EntityManager em = EMF.get().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
+		Book oldBook = em.find(Book.class, book.getIsbn());
+		if(null != oldBook) {
+			throw new DuplicateBookException();
+		}
 		try {
+			
 			tx.begin();
 			em.persist(book);
 			em.flush();
@@ -112,6 +121,9 @@ public class BookDAOImpl implements BookDAO {
 		em.close();
 	}
 
+	/**
+	 * searches the book by bookspec in the system
+	 */
 	@Override
 	public List<Book> searchBySpec(BookSearch bookSpec, int patron_id) {
 		if (null == bookSpec) {

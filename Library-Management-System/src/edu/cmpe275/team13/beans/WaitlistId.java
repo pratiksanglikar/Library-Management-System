@@ -1,10 +1,12 @@
 package edu.cmpe275.team13.beans;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 import javax.persistence.Embeddable;
 
+/**
+ * An EmbeddedId field for the Waitlist object.
+ */
 @Embeddable
 public class WaitlistId implements Serializable {
 	
@@ -13,11 +15,19 @@ public class WaitlistId implements Serializable {
 	private Long isbn;
 	private int patron_id;
 	
+	/**
+	 * default constructor
+	 */
 	public WaitlistId() {
 		isbn = null;
 		patron_id = Integer.MIN_VALUE;
 	}
 
+	/**
+	 * parameterized constructor for the system.
+	 * @param isbn
+	 * @param patron_id
+	 */
 	public WaitlistId(Long isbn, int patron_id) {
 		super();
 		this.isbn = isbn;

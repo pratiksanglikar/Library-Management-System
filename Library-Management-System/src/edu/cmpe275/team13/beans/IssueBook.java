@@ -6,10 +6,16 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * This class represents the Entry made in issue_book table when a book is issued.
+ */
 @Entity
 @Table(name = "issue_book")
 public class IssueBook {
 
+	/**
+	 * EmbeddedId for the class IssueBook.
+	 */
 	@EmbeddedId
 	private IssueBookID id;
 	
@@ -26,6 +32,13 @@ public class IssueBook {
 		setFine(0);
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @param due_date
+	 * @param actual_return_date
+	 * @param fine
+	 */
 	public IssueBook(IssueBookID id, Timestamp due_date, Timestamp actual_return_date, int fine) {
 		super();
 		this.id = id;

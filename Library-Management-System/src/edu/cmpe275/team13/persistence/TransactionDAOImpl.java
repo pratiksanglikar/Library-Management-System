@@ -30,9 +30,15 @@ import edu.cmpe275.team13.exceptions.RenewLimitExceeded;
 import edu.cmpe275.team13.service.BookService;
 import edu.cmpe275.util.Mailmail;
 
+/**
+ * the Transaction DAO implementation.
+ */
 @Service
 public class TransactionDAOImpl implements TransactionDAO {
 
+	/**
+	 * mail sender agent.
+	 */
 	Mailmail mail = new Mailmail();
 
 	@Autowired
@@ -44,6 +50,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 	@Autowired
 	private AppSettings appSettings;
 
+	/**
+	 * performs the checkout or return transaction.
+	 */
 	@Override
 	public void performTransaction(Transaction transaction) {
 		if (transaction.isCheckout()) {
@@ -53,6 +62,10 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
+	/**
+	 * performs the return transaction
+	 * @param transaction
+	 */
 	private void performReturnTransaction(Transaction transaction) {
 		EntityManager em = EMF.get().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
@@ -114,6 +127,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
+	/**
+	 * checks whether book is in waitlist of a patron
+	 * @param book
+	 * @param patron
+	 * @return
+	 */
 	private boolean isWaitlisted(Book book, Patron patron) {
 		System.out.println("Searching book for waitlist ... " + book.getTitle());
 		EntityManager em = EMF.get().createEntityManager();
@@ -159,7 +178,10 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 		return isWaitlisted;
 	}
-
+	
+	/**
+	 * returns the books which are not returned  
+	 */
 	@Override
 	public List<IssueBook> getPendingBooks(int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -172,6 +194,10 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return list;
 	}
 
+	/**
+	 * performs the checkout transaction.
+	 * @param transaction
+	 */
 	@SuppressWarnings("deprecation")
 	private void performCheckoutTransaction(Transaction transaction) {
 		System.out.println("In checkoutTransaction()");
@@ -232,6 +258,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
+	/**
+	 * returns the REservations for the book.
+	 * @param book
+	 * @param patron_id
+	 * @return
+	 */
 	private Reservation getReserved(Book book, int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
 		Query query = em.createQuery(
@@ -250,7 +282,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 	}
 
 	/**
-	 * 
+	 * returns the list of books waitlisted for a patron.
 	 * @param waitlistBooks
 	 * @param patron
 	 */
@@ -266,20 +298,57 @@ public class TransactionDAOImpl implements TransactionDAO {
 	}
 
 	/**
-	 * 
+	 * returns the waitlisted books. 
 	 * @param books
 	 * @return
 	 */
 	private List<Book> getWaitlistBooks(List<Book> books, Patron patron) {
 		List<Book> checkoutbook = new ArrayList<Book>(0);
 		for (Book book : books) {
+			/*if(isCheckedOut(book, patron)) {
+				throw new DuplicateUserInWaitlistException();
+			}*/
 			if (book.getBook_status() == BookStatus.WAITLIST && !isReserved(book, patron)) {
 				checkoutbook.add(book);
 			}
 		}
 		return checkoutbook;
 	}
+	
 
+	/**
+	 * returns if the books is checked out by patron.
+	 * @param book
+	 * @param patron
+	 * @return
+	 */
+	public boolean isCheckedOut(Book book, Patron patron) {
+		EntityManager em = EMF.get().createEntityManager();
+		Query query = em.createQuery(
+				"SELECT e FROM IssueBook e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.actual_return_date IS NULL");
+		query.setParameter("isbn", book.getIsbn());
+		query.setParameter("p_id", patron.getPatron_id());
+		IssueBook reservation = null;
+		try {
+			reservation = (IssueBook) query.getSingleResult();
+		} catch (NoResultException e) {
+			return false;
+		} finally {
+			em.close();
+		}
+		if (reservation == null) {
+			return false;
+		}
+		return true;
+	}
+	
+
+	/**
+	 * returns the books to be checked out.
+	 * @param books
+	 * @param patron
+	 * @return
+	 */
 	private List<Book> getCheckoutBooks(List<Book> books, Patron patron) {
 		List<Book> checkoutbook = new ArrayList<Book>(0);
 		for (Book book : books) {
@@ -293,6 +362,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return checkoutbook;
 	}
 
+	/**
+	 * checks the books is reserved by a patron.
+	 * @param book
+	 * @param patron
+	 * @return
+	 */
 	private boolean isReserved(Book book, Patron patron) {
 		EntityManager em = EMF.get().createEntityManager();
 		Query query = em.createQuery(
@@ -312,11 +387,23 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return true;
 	}
 
+	/**
+	 * sends the mail.
+	 * @param to
+	 * @param subject
+	 * @param mailContents
+	 */
 	private void sendMail(String to, String subject, String mailContents) {
 		String sender = "librarymanagement275@gmail.com";
 		mail.sendMail(sender, to, subject, mailContents);
 	}
 
+	/**
+	 * issue book.
+	 * @param book
+	 * @param patron_id
+	 * @return
+	 */
 	private IssueBook prepareIssueBook(Book book, int patron_id) {
 		Timestamp issue_date = new Timestamp(new java.util.Date().getTime());
 		Calendar cal = Calendar.getInstance();
@@ -327,6 +414,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return issue;
 	}
 
+	/**
+	 * get todays transactions.
+	 */
 	@Override
 	public int getTodaysTransaction(int patron_id) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -341,6 +431,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return count;
 	}
 
+	/**
+	 * returns the waitlisted books.
+	 */
 	@Override
 	public List<Waitlist> getWaitlistedBooks(int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
@@ -351,6 +444,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return waitlisted;
 	}
 
+	/**
+	 * renews the book.
+	 */
 	@Override
 	public void renewBook(Long isbn, int patron_id) {
 		Book book = this.bookService.getBookById(isbn);
@@ -399,6 +495,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
+	/**
+	 * cron job to udpate the reservations.
+	 */
 	@Override
 	public void updateReservations() {
 		EntityManager em = EMF.get().createEntityManager();
@@ -446,6 +545,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 		}
 	}
 
+	/**
+	 * cron job to to send the mail.
+	 */
 	@Override
 	public void updateEmail() {
 		EntityManager em = EMF.get().createEntityManager();

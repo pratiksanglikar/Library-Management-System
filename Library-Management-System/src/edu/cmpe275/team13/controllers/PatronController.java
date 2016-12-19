@@ -20,11 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.beans.Patron;
+import edu.cmpe275.team13.exceptions.DuplicateUserException;
 import edu.cmpe275.team13.persistence.LibrarianDAOImpl;
 import edu.cmpe275.team13.persistence.PatronDAOImpl;
 import edu.cmpe275.team13.service.TransactionService;
 import edu.cmpe275.util.Mailmail;
 
+/**
+ * This handles the user related operations.
+ */
 @Controller
 public class PatronController {
 
@@ -39,11 +43,20 @@ public class PatronController {
 	
 	private Mailmail mail = new Mailmail();
 
+	/**
+	 * return the welcome page
+	 * @return
+	 */
 	@RequestMapping(value = "/")
 	public String getWelcomePage() {
 		return "home";
 	}
 
+	/**
+	 * logout the user
+	 * @param session
+	 * @return
+	 */
 	@RequestMapping(value = "/logout")
 	public String logout(HttpSession session) {
 		if (session != null)
@@ -51,11 +64,26 @@ public class PatronController {
 		return "patronLogin";
 	}
 
+	/**
+	 * return the login page.
+	 * @param locale
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String getPatronLogin(Locale locale, Model model) {
 		return "patronLogin";
 	}
 
+	/**
+	 * login the user
+	 * @param email
+	 * @param password
+	 * @param model
+	 * @param session
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String patronLogin(@RequestParam("email") String email, @RequestParam("password") String password,
 			Model model, HttpSession session) throws NoSuchAlgorithmException {
@@ -93,6 +121,12 @@ public class PatronController {
 		return "login";
 	}
 
+	/**
+	 * activate the librarian when clicked on activation link.
+	 * @param key
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/librarianActivationlink", method = RequestMethod.GET)
 	public String librarianUpdateActivationLink(@RequestParam("key") String key, Model model) {
 
@@ -109,11 +143,27 @@ public class PatronController {
 		return "home";
 	}
 
+	/**
+	 * return signup page.
+	 * @param locale
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/signUp", method = RequestMethod.GET)
 	public String signUp(Locale locale, Model model) {
 		return "home";
 	}
 
+	/**
+	 * sign up the user.
+	 * @param patron_email
+	 * @param patron_password
+	 * @param patron_name
+	 * @param patron_id
+	 * @param model
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
 	public String createPatron(@RequestParam("email") String patron_email,
 			@RequestParam("password") String patron_password, @RequestParam("name") String patron_name,
@@ -130,8 +180,7 @@ public class PatronController {
 			if (!libDao.isLibrarianPresent(librarian)) {
 				libDao.createLibrarian(librarian);
 			} else {
-				model.addAttribute("error", "This email already exist!");
-				return "signUp";
+				throw new DuplicateUserException();
 			}
 			String link = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/librarianActivationlink?key=";
 			String s = librarian.getLibrarian_id() + ":" + librarian.getLibrarian_email() + ":" + "shrutSalt";
@@ -159,16 +208,22 @@ public class PatronController {
 				link = link + Base64.encodeBase64String(s.getBytes());
 				String sender = "librarymanagement275@gmail.com";
 				String receiver = patron.getPatron_email();
-				mail.sendMail(sender, receiver, "SJPL: Library Membership Activation Link", link);
+				mail.sendMail(sender, receiver, "Library Membership Activation Link", link);
 				System.out.println("success");
 			} else {
-				System.out.println("already present");
+				throw new DuplicateUserException();
 			}
 		}
 
 		return "home";
 	}
 
+	/**
+	 * activate the user. 
+	 * @param key
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/activationlink", method = RequestMethod.GET)
 	public String updateActivationLink(@RequestParam("key") String key, Model model) {
 		byte[] b = Base64.decodeBase64(key);
@@ -184,13 +239,25 @@ public class PatronController {
 		return "home";
 	}
 
+	/**
+	 * sends the confirmation mail
+	 * @param to
+	 */
 	private void sendConfirmationMail(String to) {
 		String sender = "librarymanagement275@gmail.com";
 		mail.sendMail(sender, to, "Team - 13 - Library Management - Activation Successfull",
 				"Hi, your account is now activated. Please login to access your account!");
 
 	}
+	
+	
 
+	/**
+	 * encrypt the password.
+	 * @param string
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
 	private String getSHADigest(String string) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		byte[] bytes = md.digest(string.getBytes());
@@ -201,6 +268,11 @@ public class PatronController {
 		return sb.toString();
 	}
 
+	/**
+	 * return the change date page.
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/changeSettings", method = RequestMethod.GET)
 	public String modifyDateSteeings(Model model) {
 		AppSettings appset = AppSettings.getInstance();
@@ -215,6 +287,12 @@ public class PatronController {
 		return "settings";
 	}
 
+	/**
+	 * change the date in the system.
+	 * @param date
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/changeDate", method = RequestMethod.POST)
 	public String modifyDate(@RequestParam("changedDate") String date, Model model) {
 		AppSettings appset = AppSettings.getInstance();

@@ -12,6 +12,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import edu.cmpe275.team13.beans.Book;
 
+/**
+ * not used in production
+ */
 public class BookSpecification implements Specification<Book> {
 
 	private BookSearch criteria;

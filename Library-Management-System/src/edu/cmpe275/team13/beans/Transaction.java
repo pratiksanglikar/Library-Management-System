@@ -3,6 +3,9 @@ package edu.cmpe275.team13.beans;
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * This class represents a bean for either checkout or return transaction. 
+ */
 public class Transaction {
 	
 	private List<Book> books;
@@ -11,6 +14,9 @@ public class Transaction {
 	
 	private Date transaction_date;
 	
+	/**
+	 * if is checkout is false, then it represents that the transaction is return transaction.
+	 */
 	private boolean isCheckout = true;
 	
 	public Transaction() {
@@ -20,6 +26,13 @@ public class Transaction {
 		this.setCheckout(true);
 	}
 
+	/**
+	 * public constructor for Transaction.
+	 * @param books
+	 * @param patron
+	 * @param transaction_date
+	 * @param isCheckout
+	 */
 	public Transaction(List<Book> books, Patron patron, Date transaction_date, boolean isCheckout) {
 		super();
 		this.books = books;

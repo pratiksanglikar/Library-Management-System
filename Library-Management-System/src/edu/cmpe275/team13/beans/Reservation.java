@@ -6,6 +6,9 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * This class represents the Bean for Reservation object in the system.
+ */
 @Entity
 @Table(name = "reservation")
 public class Reservation {
@@ -70,6 +73,4 @@ public class Reservation {
 	public void setChecked_out(boolean checked_out) {
 		this.checked_out = checked_out;
 	}
-	
-	
 }

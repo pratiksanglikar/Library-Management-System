@@ -15,7 +15,6 @@
         <class>edu.cmpe275.team13.beans.Waitlist</class>
         <class>edu.cmpe275.team13.beans.ReservationId</class>
         <class>edu.cmpe275.team13.beans.Reservation</class>
-        <class>edu.cmpe275.team13.beans.Sample</class>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>
             <property name="datanucleus.NontransactionalWrite" value="true"/>

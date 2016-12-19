@@ -5,6 +5,9 @@ import java.util.List;
 
 import edu.cmpe275.team13.beans.BookStatus;
 
+/**
+ * Bean used to search the book by specification.
+ */
 public class BookSearch {
 	private String title;
 	private String author_name;

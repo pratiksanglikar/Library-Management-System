@@ -6,6 +6,9 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * This bean represents bean for waitlist table in the system.
+ */
 @Entity
 @Table(name = "waitlist")
 public class Waitlist {
@@ -15,13 +18,20 @@ public class Waitlist {
 	
 	private Timestamp join_date;
 	
-	
+	/**
+	 * Default constructor 
+	 */
 	public Waitlist() {
 		this.id = null;
 		this.setJoin_date(null);
 
 	}
 	
+	/**
+	 * Parameterized constructor.
+	 * @param id
+	 * @param ts
+	 */
 	public Waitlist(WaitlistId id, Timestamp ts) {
 		this.id = id;
 		this.setJoin_date(ts);
@@ -42,10 +52,18 @@ public class Waitlist {
 		this.id = id;
 	}
 
+	/**
+	 * returns the join date.
+	 * @return
+	 */
 	public Timestamp getJoin_date() {
 		return join_date;
 	}
 
+	/**
+	 * sets the join date.
+	 * @param join_date
+	 */
 	public void setJoin_date(Timestamp join_date) {
 		this.join_date = join_date;
 	}

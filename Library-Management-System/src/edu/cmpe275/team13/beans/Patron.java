@@ -6,17 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/* 
- * CREATE TABLE patron (
- * 	patron_email VARCHAR(150) UNIQUE NOT NULL, 
- * 	patron_password VARCHAR(65) NOT NULL, 
- * 	patron_name VARCHAR(255) NOT NULL, 
- * 	patron_id INT(6), 
- * 	patron_verified BOOLEAN DEFAULT 0, 
- * 	books_issued INT, 
- * 	PRIMARY KEY(patron_id));
- * */
-
+/**
+ * This class represents the Bean for Patron Object in the system.
+ */
 @Entity
 @Table(name = "patron")
 public class Patron implements Serializable {

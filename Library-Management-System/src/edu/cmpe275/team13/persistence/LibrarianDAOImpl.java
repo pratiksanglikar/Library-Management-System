@@ -11,9 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.exceptions.LibrarianNotFoundException;
 
+/**
+ * DAO layer for librarian related functionality
+ */
 @Repository
 public class LibrarianDAOImpl {
     
+	/**
+	 * create a librarian
+	 * @param librarian
+	 */
     @Transactional
     public void createLibrarian(Librarian librarian) {
         EntityManager em = EMF.get().createEntityManager();
@@ -22,6 +29,11 @@ public class LibrarianDAOImpl {
         em.getTransaction().commit();
     }
 
+    /**
+     * checks whether the librarian is present in the system
+     * @param librarian
+     * @return
+     */
     @Transactional
     public boolean isLibrarianPresent(Librarian librarian) {
         EntityManager em = EMF.get().createEntityManager();
@@ -35,6 +47,11 @@ public class LibrarianDAOImpl {
         return false;
     }
 
+    /**
+     * get librarian by id
+     * @param librarian_id
+     * @return
+     */
     @Transactional
     public Librarian getLibrarian(int librarian_id) {
         EntityManager em = EMF.get().createEntityManager();
@@ -45,6 +62,10 @@ public class LibrarianDAOImpl {
         return librarian;
     }
 
+    /**
+     * update the librarian
+     * @param librarian
+     */
     @Transactional
     public void updateLibrarian(Librarian librarian) {
         EntityManager em = EMF.get().createEntityManager();
@@ -53,6 +74,12 @@ public class LibrarianDAOImpl {
         em.getTransaction().commit();
     }
 
+    /**
+     * validate the librarian account
+     * @param username
+     * @param password
+     * @return
+     */
 	@Transactional
 	public Librarian validateLibrarian(String username, String password) {
 		EntityManager em = EMF.get().createEntityManager();

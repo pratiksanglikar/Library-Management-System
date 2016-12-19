@@ -94,20 +94,6 @@
 					<td><input class="form-control" name="available_copies"></td>
 					</div>
 				</tr>
-
-				<tr>
-					<div class="form-group">
-					<td><label>Created By</label></td>
-					<td><input class="form-control" name="created_by"></td>
-					</div>
-				</tr>
-
-				<tr>
-					<div class="form-group">
-					<td><label>Updated By</label></td>
-					<td><input class="form-control" name="updated_by"></td>
-					</div>
-				</tr>
 				<tr>
 					<div class="form-group">
 					<td><label>Keywords</label></td>
