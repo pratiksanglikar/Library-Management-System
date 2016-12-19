@@ -49,4 +49,16 @@ public class TransactionServiceImpl implements TransactionService {
 	public List<Waitlist> getWaitlistedBooks(int patron_id) {
 		return this.transacationDAO.getWaitlistedBooks(patron_id);
 	}
+
+	@Override
+	public void renewBook(Long isbn, int patron) {
+		this.transacationDAO.renewBook(isbn, patron);
+	}
+
+	@Override
+	public void updateReservations(Long isbn, int patron_id) {
+		this.transacationDAO.updateReservations(isbn, patron_id);
+		
+	}
+
 }

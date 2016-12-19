@@ -1,5 +1,6 @@
 package edu.cmpe275.team13.persistence;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import edu.cmpe275.team13.beans.Book;
@@ -21,9 +23,13 @@ import edu.cmpe275.team13.beans.IssueBookID;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.beans.Reservation;
 import edu.cmpe275.team13.beans.ReservationId;
+import edu.cmpe275.team13.beans.Sample;
 import edu.cmpe275.team13.beans.Transaction;
 import edu.cmpe275.team13.beans.Waitlist;
 import edu.cmpe275.team13.beans.WaitlistId;
+import edu.cmpe275.team13.exceptions.BookNotFoundException;
+import edu.cmpe275.team13.exceptions.RenewLimitExceeded;
+import edu.cmpe275.team13.service.BookService;
 import edu.cmpe275.util.Mailmail;
 
 @Service
@@ -33,6 +39,9 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	@Autowired
 	private PatronDAOImpl patronDAO;
+	
+	@Autowired 
+	private BookService bookService;
 
 	@Override
 	public void performTransaction(Transaction transaction) {
@@ -57,19 +66,30 @@ public class TransactionDAOImpl implements TransactionDAO {
 		int i = 1;
 		try {
 			List<IssueBook> booksPending = getPendingBooks(transaction.getPatron().getPatron_id());
+			long totalFine = 0;
 			for (IssueBook issueBook : booksPending) {
 				for (Book book : books) {
 					if (book.getIsbn().equals(issueBook.getId().getIsbn())) {
-						issueBook.setActual_return_date(new Timestamp(new java.util.Date().getTime()));
-						//TODO fine
+						Timestamp actualReturnDate = new Timestamp(new java.util.Date().getTime());
+						issueBook.setActual_return_date(actualReturnDate);
+						long difference = actualReturnDate.getTime() - issueBook.getDue_date().getTime();
+						long hours = 0 ;
+						if (difference > 0) {
+							hours = difference / (3600 * 1000);
+							hours = hours/24;
+						}
 						mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
 								+ issueBook.getId().getIssue_date().toLocaleString() + "\t\t Return Date: "
-								+ issueBook.getActual_return_date().toLocaleString());
+								+ issueBook.getActual_return_date().toLocaleString() + 
+								"\t\t Fine: $" + hours);
 						i++;
+						issueBook.setFine((int) hours);
+						totalFine += hours;
 						em.merge(issueBook);
 					}
 				}
 			}
+			mailContents.append("Total Fine: " + totalFine);
 			for (Book book : books) {
 				if (isWaitlisted(book, transaction.getPatron())) {
 					book.setBook_status(BookStatus.WAITLIST);
@@ -117,11 +137,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 						new ReservationId(book.getIsbn(), waitlisted.getPatron_id(), ts), endTs, false);
 				String messgae = "The book that you were in waitlist - " + book.getTitle()
 						+ " - is now available. You can checkout this book before " + endTs.toLocaleString() + ".";
-				
+
 				sendMail(waitlisted.getPatron_email(), "Book available", messgae);
 				em.merge(reservation);
 				em.remove(list.get(0));
-				Query query1 = em.createQuery("DELETE FROM Waitlist e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid");
+				Query query1 = em
+						.createQuery("DELETE FROM Waitlist e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid");
 				System.out.println("ISBN: " + book.getIsbn());
 				System.out.println("PID: " + waitlisted.getPatron_id());
 				query1.setParameter("isbn", book.getIsbn());
@@ -170,7 +191,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 			int i = 1;
 			for (Book book : checkoutbooks) {
 				IssueBook issue = prepareIssueBook(book, transaction.getPatron().getPatron_id());
-				Reservation res = getReserved(book, transaction.getPatron().getPatron_id()); 
+				Reservation res = getReserved(book, transaction.getPatron().getPatron_id());
 				if (null != res) {
 					res.setChecked_out(true);
 				} else {
@@ -182,7 +203,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				}
 				em.merge(issue);
 				em.merge(book);
-				if(null != res) {
+				if (null != res) {
 					em.merge(res);
 				}
 				mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
@@ -213,9 +234,11 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	private Reservation getReserved(Book book, int patron_id) {
 		EntityManager em = EMF.get().createEntityManager();
-		Query query = em.createQuery("select e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = false");
+		Query query = em.createQuery(
+				"select e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = false  AND e.end_date > :date");
 		query.setParameter("isbn", book.getIsbn());
 		query.setParameter("p_id", patron_id);
+		query.setParameter("date", new Timestamp(new java.util.Date().getTime()));
 		Reservation res = null;
 		try {
 			res = (Reservation) query.getSingleResult();
@@ -272,9 +295,11 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	private boolean isReserved(Book book, Patron patron) {
 		EntityManager em = EMF.get().createEntityManager();
-		Query query = em.createQuery("SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = FALSE");
+		Query query = em.createQuery(
+				"SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = FALSE AND e.end_date > :date");
 		query.setParameter("isbn", book.getIsbn());
 		query.setParameter("p_id", patron.getPatron_id());
+		query.setParameter("date", new Timestamp(new java.util.Date().getTime()));
 		Reservation reservation = null;
 		try {
 			reservation = (Reservation) query.getSingleResult();
@@ -324,5 +349,87 @@ public class TransactionDAOImpl implements TransactionDAO {
 		@SuppressWarnings("unchecked")
 		List<Waitlist> waitlisted = query.getResultList();
 		return waitlisted;
+	}
+
+	@Override
+	public void renewBook(Long isbn, int patron_id) {
+		Book book = this.bookService.getBookById(isbn);
+		EntityManager em = EMF.get().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		Patron patron = this.patronDAO.getPatron(patron_id);
+		StringBuilder sb = new StringBuilder();
+		sb.append("Hi " + patron.getPatron_name() + ", " + "\r\r");
+		if(book.getBook_status() == BookStatus.AVAILABLE) {
+			Query query = em.createQuery("SELECT e from IssueBook e WHERE e.id.isbn = :isbn AND e.id.patron_id = :patron_id");
+			query.setParameter("isbn", book.getIsbn());
+			query.setParameter("patron_id", patron_id);
+			IssueBook issue = null;
+			try {
+				issue = (IssueBook) query.getSingleResult();
+			} catch(NoResultException e) {
+				throw new BookNotFoundException();
+			}
+			long difference = issue.getDue_date().getTime() - issue.getId().getIssue_date().getTime();
+			long days = difference / (24 * 3600 * 1000);
+			if(days > 60) {
+				throw new RenewLimitExceeded();
+			}
+			Timestamp ts = new Timestamp(issue.getDue_date().getTime());
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(ts);
+			cal.add(Calendar.DATE, 30);
+			Timestamp renewedTimestamp = new Timestamp(cal.getTime().getTime());
+			issue.setDue_date(renewedTimestamp);
+			try {
+				tx.begin();
+				em.merge(issue);
+				sb.append("The book " + book.getTitle() + " has been renewed for another 30 days. Your new due date is: " + renewedTimestamp.toLocaleString());
+				tx.commit();
+				sendMail(patron.getPatron_email(), "Book Renewal Confirmation", sb.toString());
+			} catch(Exception e) {
+				tx.rollback();
+			} finally {
+				em.close();
+			}
+		} else {
+			throw new RenewLimitExceeded();
+		}
+	}
+
+	@Override
+	public void updateReservations(Long isbn, int patron_id) {
+/*		EntityManager em = EMF.get().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
+		try {
+			Sample sample = new Sample();
+			sample.setId((int) new java.util.Date().getTime()/10000);
+			sample.setValue((int) new java.util.Date().getTime()/10000);
+			em.merge(sample);
+			tx.commit();
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
+			tx.rollback();
+		} finally {
+			em.close();
+		}
+*/	
+		Book book = this.bookService.getBookById(isbn);
+		EntityManager em = EMF.get().createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		Patron patron = this.patronDAO.getPatron(patron_id);
+		EntityManager em1 = EMF.get().createEntityManager();
+		EntityTransaction tx1 = em.getTransaction();
+		Query query = em.createQuery("SELECT e from Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :patron_id");
+		query.setParameter("isbn", book.getIsbn());
+		query.setParameter("patron_id", patron_id);
+		Reservation reservation = null;
+		try {
+			reservation = (Reservation) query.getSingleResult();
+		} catch(NoResultException e) {
+			throw new BookNotFoundException();
+		}
+		Timestamp ts = new Timestamp(reservation.getId().getStart_date().getTime());
+		
 	}
 }

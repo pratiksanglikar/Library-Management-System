@@ -9,12 +9,14 @@ import java.util.Set;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import edu.cmpe275.team13.beans.ApplicationSettings;
+import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.beans.IssueBook;
 import edu.cmpe275.team13.beans.Patron;
@@ -39,7 +41,7 @@ public class TransactionController {
 	private PatronDAOImpl patronService;
 	
 	@Autowired
-	private ApplicationSettings appSettings;
+	private AppSettings appSettings;
 
 	@RequestMapping(value = "/return", method = RequestMethod.GET)
 	public String returnBooks(HttpSession session) {
@@ -58,6 +60,12 @@ public class TransactionController {
 		transactionService.performTransaction(transaction);
 		session.setAttribute("book_list", new ArrayList<Long>(0));
 		return "redirect:/transaction/summary";
+	}
+	
+	@RequestMapping(value = "/updatereservation", method = RequestMethod.GET)
+	public ResponseEntity<Void> updateReservations2() {
+		//this.transactionService.updateReservations(isbn, patron_id);
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/checkout", method = RequestMethod.GET)
@@ -96,8 +104,8 @@ public class TransactionController {
 		model.addAttribute("issue_books", issue_books);
 		model.addAttribute("books", books);
 		model.addAttribute("waitlist", waitlisted_books);
-		model.addAttribute("date", appSettings.getDate());
-		System.out.println(appSettings.getDate());
+		model.addAttribute("date", appSettings.getAppDate());
+		System.out.println(appSettings.getAppDate());
 		return "patrondashboard";
 	}
 

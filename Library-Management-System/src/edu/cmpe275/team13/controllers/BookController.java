@@ -25,6 +25,7 @@ import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;
 import edu.cmpe275.team13.search.BookSearch;
 import edu.cmpe275.team13.service.BookService;
+import edu.cmpe275.team13.service.TransactionService;
 
 @Controller
 @RequestMapping(value = "/books")
@@ -32,6 +33,9 @@ public class BookController {
 
 	@Autowired
 	private BookService bookservice;
+	
+	@Autowired
+	private TransactionService trservice;
 
 	/**
 	 * @return the bookservice
@@ -176,5 +180,18 @@ public class BookController {
 		book.setCreated_by(((Librarian) session.getAttribute("librarian")).getLibrarian_id());
 		Long isbn = this.bookservice.addBook(book);
 		return "redirect:/books/" + isbn;
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/renew/{isbn}")
+	public String renewBook(@PathVariable Long isbn, HttpSession session){
+		if(null == session || session.getAttribute("type") == null) {
+			return "login";
+		}
+		if(session.getAttribute("type").equals("librarian")) {
+			throw new UnauthorizedAccessException();
+		}
+		int patron = (int) session.getAttribute("user_id");
+		this.trservice.renewBook(isbn, patron);
+		return "redirect:/transaction/summary";
 	}
 }

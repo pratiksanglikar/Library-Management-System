@@ -1,5 +1,7 @@
 package edu.cmpe275.team13.persistence;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -241,9 +243,10 @@ public class BookDAOImpl implements BookDAO {
 		@SuppressWarnings("unchecked")
 		List<Book> list = query.getResultList();
 		for (Book book : list) {
-			Query query1 = em.createQuery("SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid AND e.checked_out = FALSE");
+			Query query1 = em.createQuery("SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid AND e.checked_out = FALSE AND e.end_date > :date");
 			query1.setParameter("isbn", book.getIsbn());
 			query1.setParameter("pid", patron_id);
+			query1.setParameter("date", new Timestamp(new java.util.Date().getTime()));
 			Reservation  res = null;
 			try {
 				res = (Reservation) query1.getSingleResult(); 

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.cmpe275.team13.beans.ApplicationSettings;
+import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.persistence.LibrarianDAOImpl;
@@ -199,14 +199,14 @@ public class PatronController {
 
 	@RequestMapping(value = "/changeSettings", method = RequestMethod.GET)
 	public String modifyDateSteeings(Model model) {
-		ApplicationSettings appset = new ApplicationSettings();
+		AppSettings appset = AppSettings.getInstance();
 		java.util.Date today = new java.util.Date();
 
 		Date changedDate = new Date(today.getTime());
 
 		appset.setAppDate(changedDate);
 
-		model.addAttribute("date", appset.getDate());
+		model.addAttribute("date", appset.getAppDate());
 		return "settings";
 	}
 
@@ -214,7 +214,7 @@ public class PatronController {
 	public String modifyDate(@RequestParam("changedDate") String date, Model model) {
 
 		System.out.println("datee :" + date);
-		ApplicationSettings appset = new ApplicationSettings();
+		AppSettings appset = AppSettings.getInstance();
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -225,8 +225,9 @@ public class PatronController {
 			e.printStackTrace();
 		}
 		appset.setAppDate(changedDate);
-		model.addAttribute("date", appset.getDate());
+		model.addAttribute("date", appset.getAppDate());
 		return "settings";
 	}
+
 
 }
