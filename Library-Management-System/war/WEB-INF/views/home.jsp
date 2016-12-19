@@ -15,39 +15,41 @@
 			<table>
 				<tr>
 					<div class="form-group">
-					<td><span class="form-control">Email ID</span></td>
-					<td><input class="form-control" type="email" name="email" />
-					</td>
+						<td><span>Email ID</span></td>
+						<td><input class="form-control" type="email" name="email" />
+						</td>
 					</div>
 				</tr>
 				<tr>
 					<div class="form-group">
-					<td><span class="form-control">Password</span></td>
-					<td><input class="form-control" type="password"
-						name="password" /></td>
+						<td><span>Password</span></td>
+						<td><input class="form-control" type="password"
+							name="password" /></td>
 					</div>
 				</tr>
 				<tr>
 					<div class="form-group">
-					<td><span class="form-control">Name</span></td>
-					<td><input class="form-control" type="text" name="name" /></td>
+						<td><span>Name</span></td>
+						<td><input class="form-control" type="text" name="name" /></td>
 					</div>
 				</tr>
 				<tr>
 					<div class="form-group">
-					<td><span class="form-control">Student ID</span></td>
-					<td><input class="form-control" type="text" name="studentid" /></td>
+						<td><span>Student ID</span></td>
+						<td><input class="form-control" type="text" name="studentid" /></td>
 					</div>
 				</tr>
 				<tr>
-					<br><br>
+					<br>
+					<br>
 					<td></td>
-					<td><button class="btn btn-primary" type="submit" value="Submit">Submit</button></td>
+					<td><button class="btn btn-primary" type="submit"
+							value="Submit">Submit</button></td>
 				</tr>
 			</table>
 			<div style="color: red">${error}</div>
 		</div>
 	</form>
-	
+
 </body>
 </html>

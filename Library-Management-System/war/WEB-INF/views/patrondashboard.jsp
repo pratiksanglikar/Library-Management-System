@@ -25,7 +25,7 @@
 	request.setAttribute("books", null);
 	request.setAttribute("issue_books", null);
 	Timestamp date = (Timestamp) request.getAttribute("date");
-	if(date == null) {
+	if (date == null) {
 		date = new Timestamp(new java.util.Date().getTime());
 	}
 	if (issue_books.size() > 0) {
@@ -41,7 +41,8 @@
 					String input = "<button class=\"return\" class=\"btn btn-danger\" id=\"return_"
 							+ book.getIsbn() + "\"> Add to return list </button>";
 					String input1 = "";
-					if (book.getBook_status() == BookStatus.AVAILABLE && issuebook.getDue_date().getTime() > new java.util.Date().getTime())
+					if (book.getBook_status() == BookStatus.AVAILABLE
+							&& issuebook.getDue_date().getTime() > new java.util.Date().getTime())
 						input1 = "<br><button class=\"renew\" class=\"btn btn-danger\" id=\"renew_"
 								+ book.getIsbn() + "\"> Renew </button>";
 					sb.append("<td>" + input + input1 + "</td></tr>");
@@ -68,7 +69,7 @@
 	<p style="float: right;">
 		<a
 			href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
-	<%= date.toLocaleString() %>
+		<%=date.toLocaleString()%>
 	</p>
 	<h1>
 		Welcome,
@@ -91,27 +92,27 @@
 							$.get(url);
 						});
 		$(".renew")
-		.click(
-				function(event) {
-					var isbn = event.currentTarget.id.replace(
-							"renew_", "");
-					var url = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/books/renew/"
-							+ isbn;
-					$("#renew_" + isbn).attr("disabled", "disabled");
-					$.get(url, function(success) {
-						location.reload();
-					}).fail(function(){
-						alert("Renew failed!");
-					});
-				});
+				.click(
+						function(event) {
+							var isbn = event.currentTarget.id.replace("renew_",
+									"");
+							var url = "http://1-dot-cmpe-275-term-project-team-13.appspot.com/books/renew/"
+									+ isbn;
+							$("#renew_" + isbn).attr("disabled", "disabled");
+							$.get(url, function(success) {
+								location.reload();
+							}).fail(function() {
+								alert("Renew failed!");
+							});
+						});
 	</script>
 
 	<form action="/transaction/return" method="GET">
-		<input class="btn btn-link" type="submit" value="Return" />
+		<input class="btn btn-success" type="submit" value="Return" />
 	</form>
 
 	<a
 		href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/books/search/">Search</a>
-	
+
 </body>
 </html>

@@ -9,13 +9,13 @@
 			<table>
 				<tr>
 				<div class="form-group">
-					<td><span class="form-control">Email ID</span></td>
+					<td><span>Email ID</span></td>
 					<td><input class="form-control"  type="text" name="email" /></td>
 				</div>
 				</tr>
 				<tr>
 				<div class="form-group">
-					<td><span class="form-control">Password</span></td>
+					<td><span>Password</span></td>
 					<td><input class="form-control"  type="password" name="password" /></td>
 				</div>
 				</tr>
