@@ -2,7 +2,7 @@ package edu.cmpe275.team13.controllers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -22,6 +22,7 @@ import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.persistence.LibrarianDAOImpl;
 import edu.cmpe275.team13.persistence.PatronDAOImpl;
+import edu.cmpe275.team13.service.TransactionService;
 import edu.cmpe275.util.Mailmail;
 
 @Controller
@@ -33,6 +34,9 @@ public class PatronController {
 	@Autowired
 	private LibrarianDAOImpl libDao;
 
+	@Autowired
+	private TransactionService trService;
+	
 	private Mailmail mail = new Mailmail();
 
 	@RequestMapping(value = "/")
@@ -201,26 +205,21 @@ public class PatronController {
 	public String modifyDateSteeings(Model model) {
 		AppSettings appset = AppSettings.getInstance();
 		java.util.Date today = new java.util.Date();
-
-		Date changedDate = new Date(today.getTime());
-
+		Timestamp changedDate = new Timestamp(today.getTime());
 		appset.setAppDate(changedDate);
-
 		model.addAttribute("date", appset.getAppDate());
+		trService.updateEmail();
+		trService.updateReservations();
 		return "settings";
 	}
 
 	@RequestMapping(value = "/changeDate", method = RequestMethod.POST)
 	public String modifyDate(@RequestParam("changedDate") String date, Model model) {
-
-		System.out.println("datee :" + date);
 		AppSettings appset = AppSettings.getInstance();
-
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
-		Date changedDate = null;
+		Timestamp changedDate = null;
 		try {
-			changedDate = new Date(dateFormat.parse(date).getTime());
+			changedDate = new Timestamp(dateFormat.parse(date).getTime());
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -228,6 +227,4 @@ public class PatronController {
 		model.addAttribute("date", appset.getAppDate());
 		return "settings";
 	}
-
-
 }

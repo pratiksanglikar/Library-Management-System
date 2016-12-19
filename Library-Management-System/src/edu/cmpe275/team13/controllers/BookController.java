@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.cmpe275.team13.beans.Book;
-import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
 import edu.cmpe275.team13.exceptions.UnauthorizedAccessException;

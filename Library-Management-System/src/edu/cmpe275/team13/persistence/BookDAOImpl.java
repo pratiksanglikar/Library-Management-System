@@ -1,6 +1,5 @@
 package edu.cmpe275.team13.persistence;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,10 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.Reservation;
@@ -24,8 +25,8 @@ import edu.cmpe275.team13.search.BookSearch;
 @Service
 public class BookDAOImpl implements BookDAO {
 
-	// @PersistenceContext
-	// EntityManager em;
+	@Autowired
+	private AppSettings appSettings;
 
 	/**
 	 * Adds a new book in the system.
@@ -246,7 +247,7 @@ public class BookDAOImpl implements BookDAO {
 			Query query1 = em.createQuery("SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :pid AND e.checked_out = FALSE AND e.end_date > :date");
 			query1.setParameter("isbn", book.getIsbn());
 			query1.setParameter("pid", patron_id);
-			query1.setParameter("date", new Timestamp(new java.util.Date().getTime()));
+			query1.setParameter("date", new Timestamp(appSettings.getAppDate().getTime()));
 			Reservation  res = null;
 			try {
 				res = (Reservation) query1.getSingleResult(); 

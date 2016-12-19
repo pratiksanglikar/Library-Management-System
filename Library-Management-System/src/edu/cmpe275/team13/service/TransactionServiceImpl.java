@@ -56,9 +56,14 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updateReservations(Long isbn, int patron_id) {
-		this.transacationDAO.updateReservations(isbn, patron_id);
+	public void updateReservations() {
+		this.transacationDAO.updateReservations();
 		
+	}
+
+	@Override
+	public void updateEmail() {
+		this.transacationDAO.updateEmail();
 	}
 
 }

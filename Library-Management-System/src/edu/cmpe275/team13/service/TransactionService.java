@@ -12,5 +12,6 @@ public interface TransactionService {
 	public List<IssueBook> getPendingBooks(int patron_id);
 	public List<Waitlist> getWaitlistedBooks(int patron_id);
 	public void renewBook(Long isbn, int patron);
-	public void updateReservations(Long isbn, int patron_id);
+	public void updateReservations();
+	public void updateEmail();
 }

@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="edu.cmpe275.team13.beans.*"%>
 <%@ page import="java.util.*"%>
-<%@ page import="java.sql.Date"%>
+<%@ page import="java.sql.*"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -24,7 +24,7 @@
 	List<Book> waitlist = (List<Book>) request.getAttribute("waitlist");
 	request.setAttribute("books", null);
 	request.setAttribute("issue_books", null);
-	java.sql.Date date = (java.sql.Date) request.getAttribute("date");
+	Timestamp date = (Timestamp) request.getAttribute("date");
 	if (issue_books.size() > 0) {
 		sb.append(
 				"<table class=\"table table-bordered\"><tr><th> Book </th><th> Title </th><th> Issue Date </th> <th> Due Date </th> <th></th></tr>");

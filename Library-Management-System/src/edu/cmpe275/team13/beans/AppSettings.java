@@ -1,6 +1,6 @@
 package edu.cmpe275.team13.beans;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.springframework.stereotype.Service;
 
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 public class AppSettings {
 	
 	private static AppSettings appSettings = null;
-	private static Date appDate;
+	private static Timestamp appDate;
 	
 	private AppSettings(){
-		AppSettings.appDate = new Date(new java.util.Date().getTime());
+		AppSettings.appDate = new Timestamp(new java.util.Date().getTime());
 	}
 
 	public static AppSettings getInstance() {
@@ -21,11 +21,11 @@ public class AppSettings {
 	return appSettings;
 	}
 
-	public void setAppDate(Date appDate) {
+	public void setAppDate(Timestamp appDate) {
 		AppSettings.appDate = appDate;
 	}
 
-	public Date getAppDate() {
+	public Timestamp getAppDate() {
 		return appDate;
 	}
 }

@@ -19,14 +19,12 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	@Override
 	public Long addBook(Book book) {
-		// ASSUMED created by attribute is already set.
 		return bookDAO.addBook(book);
 	}
 
 	@Transactional
 	@Override
 	public void updateBook(Book book) {
-		// ASSUMED updated by attribute is already set.
 		bookDAO.updateBook(book);
 	}
 

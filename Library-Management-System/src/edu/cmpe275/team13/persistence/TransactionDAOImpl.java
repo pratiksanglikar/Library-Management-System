@@ -1,6 +1,5 @@
 package edu.cmpe275.team13.persistence;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,9 +12,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.beans.BookStatus;
 import edu.cmpe275.team13.beans.IssueBook;
@@ -23,7 +22,6 @@ import edu.cmpe275.team13.beans.IssueBookID;
 import edu.cmpe275.team13.beans.Patron;
 import edu.cmpe275.team13.beans.Reservation;
 import edu.cmpe275.team13.beans.ReservationId;
-import edu.cmpe275.team13.beans.Sample;
 import edu.cmpe275.team13.beans.Transaction;
 import edu.cmpe275.team13.beans.Waitlist;
 import edu.cmpe275.team13.beans.WaitlistId;
@@ -39,9 +37,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 
 	@Autowired
 	private PatronDAOImpl patronDAO;
-	
-	@Autowired 
+
+	@Autowired
 	private BookService bookService;
+
+	@Autowired
+	private AppSettings appSettings;
 
 	@Override
 	public void performTransaction(Transaction transaction) {
@@ -60,7 +61,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		mailContents.append("Hi, " + transaction.getPatron().getPatron_name() + ", \r");
 		mailContents.append(
 				"Thank you for using Team - 13 Library Management System. Here's the summary of your recent transaction: \r\r");
-		mailContents.append("\r\r Transaction Date: " + new java.util.Date().toLocaleString());
+		mailContents.append("\r\r Transaction Date: " + appSettings.getAppDate().toLocaleString());
 		mailContents.append("\r\rFollowing books were returned recently: ");
 		tx.begin();
 		int i = 1;
@@ -70,18 +71,17 @@ public class TransactionDAOImpl implements TransactionDAO {
 			for (IssueBook issueBook : booksPending) {
 				for (Book book : books) {
 					if (book.getIsbn().equals(issueBook.getId().getIsbn())) {
-						Timestamp actualReturnDate = new Timestamp(new java.util.Date().getTime());
+						Timestamp actualReturnDate = appSettings.getAppDate();
 						issueBook.setActual_return_date(actualReturnDate);
 						long difference = actualReturnDate.getTime() - issueBook.getDue_date().getTime();
-						long hours = 0 ;
+						long hours = 0;
 						if (difference > 0) {
 							hours = difference / (3600 * 1000);
-							hours = hours/24;
+							hours = hours / 24;
 						}
 						mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
 								+ issueBook.getId().getIssue_date().toLocaleString() + "\t\t Return Date: "
-								+ issueBook.getActual_return_date().toLocaleString() + 
-								"\t\t Fine: $" + hours);
+								+ issueBook.getActual_return_date().toLocaleString() + "\t\t Fine: $" + hours);
 						i++;
 						issueBook.setFine((int) hours);
 						totalFine += hours;
@@ -96,7 +96,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				} else {
 					book.setBook_status(BookStatus.AVAILABLE);
 					book.setAvailable_copies(book.getAvailable_copies() + 1);
-				}
+				} // ASSUMED this tag just for quick link
 				em.merge(book);
 			}
 			Patron patron = transaction.getPatron();
@@ -126,7 +126,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 			@SuppressWarnings("unchecked")
 			List<Waitlist> list = query.getResultList();
 			isWaitlisted = list.size() > 0;
-			Timestamp ts = new Timestamp(new java.util.Date().getTime());
+			Timestamp ts = appSettings.getAppDate();
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(ts);
 			cal.add(Calendar.DATE, 3);
@@ -172,7 +172,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		return list;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings("deprecation")
 	private void performCheckoutTransaction(Transaction transaction) {
 		System.out.println("In checkoutTransaction()");
 		EntityManager em = EMF.get().createEntityManager();
@@ -185,7 +185,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		mailContents.append("Hi, " + transaction.getPatron().getPatron_name() + ", \r");
 		mailContents.append(
 				"Thank you for using Team - 13 Library Management System. Here's the summary of your recent transaction: \r\r");
-		mailContents.append("\r\r Transaction Date: " + new java.util.Date().toLocaleString());
+		mailContents.append("\r\r Transaction Date: " + appSettings.getAppDate().toLocaleString());
 		try {
 			System.out.println("In try - checkout");
 			int i = 1;
@@ -238,7 +238,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				"select e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = false  AND e.end_date > :date");
 		query.setParameter("isbn", book.getIsbn());
 		query.setParameter("p_id", patron_id);
-		query.setParameter("date", new Timestamp(new java.util.Date().getTime()));
+		query.setParameter("date", appSettings.getAppDate());
 		Reservation res = null;
 		try {
 			res = (Reservation) query.getSingleResult();
@@ -259,7 +259,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		List<Waitlist> list = new ArrayList<Waitlist>(0);
 		for (Book book : waitlistBooks) {
 			WaitlistId id = new WaitlistId(book.getIsbn(), patron.getPatron_id());
-			Waitlist wl = new Waitlist(id, new Timestamp(new java.util.Date().getTime()));
+			Waitlist wl = new Waitlist(id, appSettings.getAppDate());
 			list.add(wl);
 		}
 		return list;
@@ -299,7 +299,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 				"SELECT e FROM Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :p_id AND e.checked_out = FALSE AND e.end_date > :date");
 		query.setParameter("isbn", book.getIsbn());
 		query.setParameter("p_id", patron.getPatron_id());
-		query.setParameter("date", new Timestamp(new java.util.Date().getTime()));
+		query.setParameter("date", appSettings.getAppDate());
 		Reservation reservation = null;
 		try {
 			reservation = (Reservation) query.getSingleResult();
@@ -332,7 +332,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		EntityManager em = EMF.get().createEntityManager();
 		Query query = em.createQuery("SELECT e FROM IssueBook e WHERE e.id.issue_date LIKE \'%"
-				+ df.format(new java.util.Date()) + "%\'" + " AND e.id.patron_id = :patron_id");
+				+ df.format(appSettings.getAppDate()) + "%\'" + " AND e.id.patron_id = :patron_id");
 		// query.setParameter("issue_date", df.format(new java.util.Date()) +
 		// "%");
 		query.setParameter("patron_id", patron_id);
@@ -359,19 +359,20 @@ public class TransactionDAOImpl implements TransactionDAO {
 		Patron patron = this.patronDAO.getPatron(patron_id);
 		StringBuilder sb = new StringBuilder();
 		sb.append("Hi " + patron.getPatron_name() + ", " + "\r\r");
-		if(book.getBook_status() == BookStatus.AVAILABLE) {
-			Query query = em.createQuery("SELECT e from IssueBook e WHERE e.id.isbn = :isbn AND e.id.patron_id = :patron_id");
+		if (book.getBook_status() == BookStatus.AVAILABLE) {
+			Query query = em
+					.createQuery("SELECT e from IssueBook e WHERE e.id.isbn = :isbn AND e.id.patron_id = :patron_id");
 			query.setParameter("isbn", book.getIsbn());
 			query.setParameter("patron_id", patron_id);
 			IssueBook issue = null;
 			try {
 				issue = (IssueBook) query.getSingleResult();
-			} catch(NoResultException e) {
+			} catch (NoResultException e) {
 				throw new BookNotFoundException();
 			}
 			long difference = issue.getDue_date().getTime() - issue.getId().getIssue_date().getTime();
 			long days = difference / (24 * 3600 * 1000);
-			if(days > 60) {
+			if (days > 60) {
 				throw new RenewLimitExceeded();
 			}
 			Timestamp ts = new Timestamp(issue.getDue_date().getTime());
@@ -383,10 +384,12 @@ public class TransactionDAOImpl implements TransactionDAO {
 			try {
 				tx.begin();
 				em.merge(issue);
-				sb.append("The book " + book.getTitle() + " has been renewed for another 30 days. Your new due date is: " + renewedTimestamp.toLocaleString());
+				sb.append(
+						"The book " + book.getTitle() + " has been renewed for another 30 days. Your new due date is: "
+								+ renewedTimestamp.toLocaleString());
 				tx.commit();
 				sendMail(patron.getPatron_email(), "Book Renewal Confirmation", sb.toString());
-			} catch(Exception e) {
+			} catch (Exception e) {
 				tx.rollback();
 			} finally {
 				em.close();
@@ -397,39 +400,82 @@ public class TransactionDAOImpl implements TransactionDAO {
 	}
 
 	@Override
-	public void updateReservations(Long isbn, int patron_id) {
-/*		EntityManager em = EMF.get().createEntityManager();
+	public void updateReservations() {
+		EntityManager em = EMF.get().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
-		tx.begin();
+		Query query = em.createQuery("SELECT e from Reservation e WHERE e.end_date > :end_date");
+		query.setParameter("end_date", appSettings.getAppDate());
+		List<Reservation> reservation = null;
 		try {
-			Sample sample = new Sample();
-			sample.setId((int) new java.util.Date().getTime()/10000);
-			sample.setValue((int) new java.util.Date().getTime()/10000);
-			em.merge(sample);
-			tx.commit();
-		} catch(Exception e) {
+			tx.begin();
+			reservation = (List<Reservation>) query.getResultList();
+			for (Reservation res : reservation) {
+				Query waitlistQuery = em
+						.createQuery("SELECT e FROM Waitlist e WHERE e.id.isbn = :isbn ORDER BY e.join_date");
+				waitlistQuery.setParameter("isbn", res.getId().getIsbn());
+				List<Waitlist> waitlisted = (List<Waitlist>) waitlistQuery.getResultList();
+				if (waitlisted.size() > 0) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(appSettings.getAppDate());
+					cal.add(Calendar.DATE, 3);
+					Timestamp endTs = new Timestamp(cal.getTime().getTime());
+					Reservation reservations1 = new Reservation(new ReservationId(res.getId().getIsbn(),
+							waitlisted.get(0).getId().getPatron_id(), appSettings.getAppDate()), endTs, false);
+					Patron patron = this.patronDAO.getPatron(waitlisted.get(0).getId().getPatron_id());
+					em.remove(waitlisted.get(0));
+					em.remove(res);
+					em.merge(reservations1);
+					Book book = this.bookService.getBookById(res.getId().getIsbn());
+					String messgae = "The book that you were in waitlist - " + book.getTitle()
+							+ " - is now available. You can checkout this book before " + endTs.toLocaleString() + ".";
+					sendMail(patron.getPatron_email(), "Book available", messgae);
+				} else {
+					Book book = this.bookService.getBookById(res.getId().getIsbn());
+					book.setAvailable_copies(book.getAvailable_copies() + 1);
+					book.setBook_status(BookStatus.AVAILABLE);
+					em.remove(res);
+					em.merge(book);
+				}
+				tx.commit();
+			}
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			tx.rollback();
 		} finally {
 			em.close();
 		}
-*/	
-		Book book = this.bookService.getBookById(isbn);
+	}
+
+	@Override
+	public void updateEmail() {
 		EntityManager em = EMF.get().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
-		Patron patron = this.patronDAO.getPatron(patron_id);
-		EntityManager em1 = EMF.get().createEntityManager();
-		EntityTransaction tx1 = em.getTransaction();
-		Query query = em.createQuery("SELECT e from Reservation e WHERE e.id.isbn = :isbn AND e.id.patron_id = :patron_id");
-		query.setParameter("isbn", book.getIsbn());
-		query.setParameter("patron_id", patron_id);
-		Reservation reservation = null;
 		try {
-			reservation = (Reservation) query.getSingleResult();
-		} catch(NoResultException e) {
-			throw new BookNotFoundException();
+			tx.begin();
+			Query query = em.createQuery("SELECT e FROM IssueBook e WHERE e.due_date <= :date");
+			Timestamp ts = appSettings.getAppDate();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(ts);
+			cal.add(Calendar.DATE, 5);
+			Timestamp endTs = new Timestamp(cal.getTime().getTime());
+			query.setParameter("date", endTs);
+			@SuppressWarnings("unchecked")
+			List<IssueBook> books = (List<IssueBook>) query.getResultList();
+			StringBuilder messageContent = new StringBuilder();
+			for (IssueBook issueBook : books) {
+				Patron patron = this.patronDAO.getPatron(issueBook.getId().getPatron_id());
+				Book book = this.bookService.getBookById(issueBook.getId().getIsbn());
+				messageContent
+						.append("Hi, " + patron.getPatron_name() + ", \r\r This email to remind you that the book "
+								+ book.getTitle() + " is due within 5 days. Please return or renew the book before "
+								+ issueBook.getDue_date().toLocaleString());
+				sendMail(patron.getPatron_email(), "Book Return Reminder", messageContent.toString());
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			tx.rollback();
+		} finally {
+			em.close();
 		}
-		Timestamp ts = new Timestamp(reservation.getId().getStart_date().getTime());
-		
 	}
 }

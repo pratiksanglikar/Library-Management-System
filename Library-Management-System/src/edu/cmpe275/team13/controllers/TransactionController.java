@@ -64,9 +64,17 @@ public class TransactionController {
 	
 	@RequestMapping(value = "/updatereservation", method = RequestMethod.GET)
 	public ResponseEntity<Void> updateReservations2() {
-		//this.transactionService.updateReservations(isbn, patron_id);
+		this.transactionService.updateReservations();
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/emailupdates", method = RequestMethod.GET)
+	public ResponseEntity<Void> updateEmail() {
+		this.transactionService.updateEmail();
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	
 
 	@RequestMapping(value = "/checkout", method = RequestMethod.GET)
 	public String checkoutBooks(HttpSession session) {
@@ -131,7 +139,7 @@ public class TransactionController {
 		for (Long isbn : book_list) {
 			books.add(bookservice.getBookById(isbn));
 		}
-		Transaction transaction = new Transaction(books, patron, new Date(new java.util.Date().getTime()), isCheckout);
+		Transaction transaction = new Transaction(books, patron, new Date(appSettings.getAppDate().getTime()), isCheckout);
 		return transaction;
 	}
 

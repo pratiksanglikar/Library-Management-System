@@ -6,4 +6,10 @@
    <description>update reservations</description>
    <schedule>every 1 minutes</schedule>
  </cron>
+ <cron>
+   <url>/transaction/emailupdates</url>
+   <target>beta</target>
+   <description>Email Updates</description>
+   <schedule>every 24 hours</schedule>
+ </cron>
 </cronentries>
