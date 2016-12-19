@@ -4,6 +4,11 @@ import java.sql.Timestamp;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * @author pratiksanglikar
+ *
+ */
 @Service
 public class AppSettings {
 	

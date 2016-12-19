@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.cmpe275.team13.beans.AppSettings;
 import edu.cmpe275.team13.beans.Book;
 import edu.cmpe275.team13.beans.Librarian;
 import edu.cmpe275.team13.exceptions.BookNotFoundException;
@@ -35,6 +36,9 @@ public class BookController {
 	
 	@Autowired
 	private TransactionService trservice;
+	
+	@Autowired
+	private AppSettings appSettings;
 
 	/**
 	 * @return the bookservice
@@ -58,6 +62,7 @@ public class BookController {
 		}
 		Book book = bookservice.getBookById(isbn);
 		model.addAttribute("book", book);
+		model.addAttribute("date", appSettings.getAppDate());
 		return "book/showbook";
 	}
 
@@ -71,6 +76,7 @@ public class BookController {
 		}
 		Book book = bookservice.getBookById(isbn);
 		model.addAttribute("book", book);
+		model.addAttribute("date", appSettings.getAppDate());
 		return "book/updatebook";
 	}
 
@@ -129,13 +135,14 @@ public class BookController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String listBooks(HttpSession session) {
+	public String listBooks(HttpSession session, Model model) {
 		if(null == session || session.getAttribute("type") == null) {
 			return "login";
 		}
 		if(!session.getAttribute("type").equals("librarian")) {
 			throw new UnauthorizedAccessException();
 		}
+		model.addAttribute("date", appSettings.getAppDate());
 		return "book/createbook";
 	}
 
@@ -154,14 +161,16 @@ public class BookController {
 				isbn, year, status, created_by, updated_by, keywords);
 		List<Book> books = this.bookservice.searchBySpec(booksearch, (int) session.getAttribute("user_id"));
 		model.addAttribute("books", books);
+		model.addAttribute("date", appSettings.getAppDate());
 		return "book/searchresults";
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public String searchBook(HttpSession session) {
+	public String searchBook(HttpSession session, Model model) {
 		if(null == session || session.getAttribute("type") == null) {
 			return "login";
 		}
+		model.addAttribute("date", appSettings.getAppDate());
 		return "book/searchbook";
 	}
 

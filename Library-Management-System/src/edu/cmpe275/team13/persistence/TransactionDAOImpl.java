@@ -81,7 +81,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 						}
 						mailContents.append("\r\r" + i + ") Book: " + book.getTitle() + "\t\tCheckout Date:"
 								+ issueBook.getId().getIssue_date().toLocaleString() + "\t\t Return Date: "
-								+ issueBook.getActual_return_date().toLocaleString() + "\t\t Fine: $" + hours);
+								+ issueBook.getActual_return_date().toLocaleString() + "\t\t Fine: $" + hours +".00");
 						i++;
 						issueBook.setFine((int) hours);
 						totalFine += hours;
@@ -89,7 +89,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 					}
 				}
 			}
-			mailContents.append("Total Fine: " + totalFine);
+			mailContents.append("\r\rTotal Fine: $" + totalFine + ".00");
 			for (Book book : books) {
 				if (isWaitlisted(book, transaction.getPatron())) {
 					book.setBook_status(BookStatus.WAITLIST);
@@ -452,7 +452,7 @@ public class TransactionDAOImpl implements TransactionDAO {
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-			Query query = em.createQuery("SELECT e FROM IssueBook e WHERE e.due_date <= :date");
+			Query query = em.createQuery("SELECT e FROM IssueBook e WHERE e.due_date <= :date AND e.actual_return_date IS NULL group by e.id.patron_id");
 			Timestamp ts = appSettings.getAppDate();
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(ts);
@@ -463,14 +463,18 @@ public class TransactionDAOImpl implements TransactionDAO {
 			List<IssueBook> books = (List<IssueBook>) query.getResultList();
 			StringBuilder messageContent = new StringBuilder();
 			for (IssueBook issueBook : books) {
+				Patron oldPatron = null;
 				Patron patron = this.patronDAO.getPatron(issueBook.getId().getPatron_id());
 				Book book = this.bookService.getBookById(issueBook.getId().getIsbn());
 				messageContent
 						.append("Hi, " + patron.getPatron_name() + ", \r\r This email to remind you that the book "
 								+ book.getTitle() + " is due within 5 days. Please return or renew the book before "
 								+ issueBook.getDue_date().toLocaleString());
+				
 				sendMail(patron.getPatron_email(), "Book Return Reminder", messageContent.toString());
+				messageContent = new StringBuilder();
 			}
+			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			tx.rollback();

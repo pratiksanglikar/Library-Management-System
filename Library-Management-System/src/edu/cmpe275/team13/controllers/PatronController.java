@@ -206,7 +206,9 @@ public class PatronController {
 		AppSettings appset = AppSettings.getInstance();
 		java.util.Date today = new java.util.Date();
 		Timestamp changedDate = new Timestamp(today.getTime());
-		appset.setAppDate(changedDate);
+		if(appset.getAppDate() != null) {
+			appset.setAppDate(changedDate);
+		}
 		model.addAttribute("date", appset.getAppDate());
 		trService.updateEmail();
 		trService.updateReservations();
@@ -225,6 +227,8 @@ public class PatronController {
 		}
 		appset.setAppDate(changedDate);
 		model.addAttribute("date", appset.getAppDate());
-		return "settings";
+		trService.updateEmail();
+		trService.updateReservations();
+		return "book/searchbook";
 	}
 }

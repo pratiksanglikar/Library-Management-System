@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="edu.cmpe275.team13.beans.Book" %>
+<%@ page import = "java.sql.Timestamp" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -12,8 +13,10 @@
 	crossorigin="anonymous">
 </head>
 <body>
+<%Timestamp date = (Timestamp) request.getAttribute("date"); %>
 <p style="float:right;">
 	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	<%= date.toLocaleString() %>
 	</p>
 	
 	<% Book book = (Book) request.getAttribute("book"); %>

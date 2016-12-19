@@ -25,6 +25,9 @@
 	request.setAttribute("books", null);
 	request.setAttribute("issue_books", null);
 	Timestamp date = (Timestamp) request.getAttribute("date");
+	if(date == null) {
+		date = new Timestamp(new java.util.Date().getTime());
+	}
 	if (issue_books.size() > 0) {
 		sb.append(
 				"<table class=\"table table-bordered\"><tr><th> Book </th><th> Title </th><th> Issue Date </th> <th> Due Date </th> <th></th></tr>");
@@ -65,6 +68,7 @@
 	<p style="float: right;">
 		<a
 			href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	<%= date.toLocaleString() %>
 	</p>
 	<h1>
 		Welcome,
@@ -106,7 +110,6 @@
 		<input class="btn btn-link" type="submit" value="Return" />
 	</form>
 
-	<%= date.toLocaleString() %>
 	<a
 		href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/books/search/">Search</a>
 	

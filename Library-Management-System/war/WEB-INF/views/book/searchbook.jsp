@@ -3,6 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="edu.cmpe275.team13.search.BookSearch"%>
 <%@ page import="edu.cmpe275.team13.beans.*"%>
+<%@ page import = "java.sql.Timestamp" %>
+<%@ page import = "java.util.Date" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -11,8 +13,14 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
+<% Timestamp date = (Timestamp) request.getAttribute("date");
+	if(date == null) {
+		date = new Timestamp(new java.util.Date().getTime());
+	}
+	%>
 <p style="float:right;">
 	<a href="http://1-dot-cmpe-275-term-project-team-13.appspot.com/logout">Logout</a>
+	<%= date.toLocaleString() %>
 	</p>
 	
 	<%
@@ -86,9 +94,10 @@
 		String string = "";
 		if(session.getAttribute("type").equals("librarian")) {
 			string += "<form action=\"/books\" method=\"GET\">	<input type=\"submit\" value=\"Add Book\"/></form>";
+			string += "<input type=\"submit\" onclick=\"location.href='/changeSettings'\" value=\"Change Date\" />";
 		}
 	%>
 	<%=string %>
-	<input type="submit" onclick="location.href='/changeSettings'" value="Change Settings" />
+	
 </body>
 </html>
